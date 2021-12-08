@@ -29,7 +29,6 @@ public class ForgotPasswordGUI extends Application {
     {
         username = new TextField();
         email = new TextField();
-
         toLoginPage = new Button("Login Page");
         toRegiPage = new Button("to Registration Page");
         disconnect = new Button("Disconnect");
@@ -55,10 +54,8 @@ public class ForgotPasswordGUI extends Application {
         links.getChildren().add(disconnect);
         root.setRight(links);
         BorderPane.setMargin(links, new Insets(10));
-
         root.setBottom(disconnect);
         BorderPane.setMargin(root.getBottom(), new Insets(10,10,10,WIDTH-100));
-
         recoverPasswordGUI = new Scene(root, WIDTH, HEIGHT);
         mainStage.setScene(recoverPasswordGUI);
         mainStage.show();

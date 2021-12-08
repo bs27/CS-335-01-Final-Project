@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -28,7 +29,12 @@ public class ClientGUI extends Application
 
     Scene connectGUI;
     Scene loginGUI;
+    Scene registrationGUI;
+    Scene recoverPasswordGUI;
+    Scene postLoginGUI;
+    Scene changePasswordGUI;
 
+//Login GUI
     Button submitButton = new Button("Submit");
     Button forgotPassButton = new Button("Forgot your Password?");
     Button registerButton = new Button("Register");
@@ -36,10 +42,35 @@ public class ClientGUI extends Application
     PasswordField passwordField = new PasswordField();
     Button connectbutton = new Button("Connect");
     private Button disconnect = new Button("Disconnect");
-
+//Connect GUI
     Label enterIP = new Label("Enter IP Address Below");
     TextField ipAddressField = new TextField("0.0.0.0");
     Label errorIncorrectIPFormat = new Label("This isn't an IP Address DUMBASS!");
+    //Registration GUI
+    private Button registerButton2 = new Button("Submit");
+    private Button loginPageButton = new Button("Back to Login Page");
+    private Button disconnectBtn = new Button("Disconnect");
+    private TextField usernameField2 = new TextField();
+    private PasswordField passwordField2 = new PasswordField();
+    private TextField emailField = new TextField();
+    //Forgot/Recover Password
+    private TextField username;
+    private TextField email;
+    private Button toLoginPage;
+    private Button toRegiPage;
+    private Button disconnect2;
+    private Button submitRequest;
+    //Post Login GUI
+    private Label welcomeMesAGE = new Label("Welcome to Booked Blocks! " + getUsername());
+    private Button highScoresButton = new Button("High Scores");
+    private Button howToPlayButton = new Button("How to Play");
+    private Button changePasswordButton = new Button("Change Password");
+    private Button playButton = new Button("Play Now!");
+    private Button disconnect3 = new Button("Disconnect");
+    private Button logout = new Button("Log Out");
+
+
+
 
 
 
@@ -57,8 +88,16 @@ public class ClientGUI extends Application
         mainStage.setScene(connectGUI);
         // -- display the aplication window
         mainStage.show();
+        disconnect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
 
-
+            }
+        });
 
 
         // -- clean up on close
@@ -75,25 +114,91 @@ public class ClientGUI extends Application
                 System.exit(0);
             }
         });
+        //Recover Password GUI
+        username = new TextField();
 
 
 
+        email = new TextField();
+        toLoginPage = new Button("Login Page");
+        toRegiPage = new Button("to Registration Page");
+        disconnect2 = new Button("Disconnect");
 
-        // -- add the graphics canvas and the control box to the Border Pane
+        submitRequest = new Button("Submit");
+        BorderPane root = new BorderPane();
+        // set up
+        VBox input = new VBox();
+        input.setSpacing(10);
+        input.getChildren().add(new Label("~Recover Password~"));
+        input.getChildren().add(new Label("Username"));
+        input.getChildren().add(username);
+        input.getChildren().add(new Label("Email"));
+        input.getChildren().add(email);
+        input.getChildren().add(submitRequest);
+        root.setLeft(input);
+        BorderPane.setMargin(input, new Insets(10));
+        VBox links = new VBox();
+        links.setSpacing(10);
+        links.getChildren().add(toRegiPage);
+        links.getChildren().add(toLoginPage);
+        links.getChildren().add(new Label(" ")); // empty space
+        links.getChildren().add(disconnect2);
+        root.setRight(links);
+        BorderPane.setMargin(links, new Insets(10));
+        root.setBottom(disconnect2);
+        BorderPane.setMargin(root.getBottom(), new Insets(10,10,10,WIDTH-100));
+        recoverPasswordGUI = new Scene(root, WIDTH, HEIGHT);
+        disconnect2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
 
+            }
+        });
+
+        //post Login GUI
+        VBox postLayout = new VBox(welcomeMesAGE, playButton, highScoresButton, howToPlayButton, changePasswordButton, logout, disconnect3);
+        postLoginGUI = new Scene(postLayout);
+        disconnect3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                // DON't Forget to Logout
+                System.out.println("Don't forget to logout");
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
+
+            }
+        });
+        logout.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // DON't Forget to Logout
+                System.out.println("Don't forget to logout");
+                mainStage.setScene(loginGUI);
+
+            }
+        });
 
 
         loginGUI = new Scene(new VBox(new Label("WELCOME!"), new Label("Username:"), usernameField,new Label("Password:"),passwordField,submitButton,forgotPassButton,registerButton,disconnect));
         registerButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
+                mainStage.setScene(registrationGUI);
             }
         });
 
         forgotPassButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                mainStage.setScene(recoverPasswordGUI);
+                mainStage.show();
+                root.requestFocus();
 
             }
         });
@@ -105,7 +210,10 @@ public class ClientGUI extends Application
                 boolean x = true;
 
                 String response = client.getNetworkAccess().sendString(message,x);
-                System.out.println(response);
+                System.out.println(response+"No sign in implemented");
+                mainStage.setScene(postLoginGUI);
+
+
 
 
             }
@@ -148,6 +256,97 @@ public class ClientGUI extends Application
                 }
             }
         });
+        VBox layout = new VBox(new Label("Register Page: "),new Label("Email:"),emailField,new Label("Username:"),usernameField2,new Label("Password:"),passwordField2,registerButton2,loginPageButton,disconnectBtn);
+        registrationGUI = new Scene(layout);
+        // -- create button handlers
+        registerButton2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String email = emailField.getText();
+                String username = usernameField.getText();
+                String password = passwordField.getText();
+
+                // Unsuccessful registration:
+                if(email.equals("") || username.equals("") || password.equals("")) {
+                    errorPopup("Empty fields", "Enter your registration information in all fields");
+                }
+
+                if(!RegexValidation.validEmailAddress(email)) {
+                    errorPopup("Invalid Email Address", "Please enter a valid email address");
+                }
+
+                if(!RegexValidation.validSimplePassword(password)) {
+                    errorPopup("Invalid Password",
+                            "Password must be at least 8 characters long," +
+                                    " have at least one digit, and have one upper or lower case letter");
+                }
+
+                // Successful Registration: Send email, username, password to database
+                // Then, go back to login page (refer to ben's login page scene)
+
+                // mainStage.setScene(loginGUI);
+            }
+        });
+        loginPageButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // refer to ben's login page scene
+                   mainStage.setScene(loginGUI);
+            }
+        });
+        toLoginPage.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                mainStage.setScene(loginGUI);
+            }
+        });
+        toRegiPage.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                mainStage.setScene(registrationGUI);
+            }
+        });
+
+        // -- create button handlers for Post Login
+        highScoresButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+
+            }
+        });
+        playButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+
+            }
+        });
+
+        howToPlayButton.setOnAction(new EventHandler<ActionEvent>() {
+                                        @Override
+                                        public void handle(ActionEvent actionEvent) {
+
+                                        }
+                                    }
+        );
+
+        changePasswordButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+        disconnectBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
+
+            }
+        });
+
 
     }
     // -- launch the application
@@ -172,4 +371,12 @@ public class ClientGUI extends Application
             return false;
         }
     }
+    public void errorPopup (String title, String contentText) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle(title);
+        error.setContentText(contentText);
+    }private String getUsername() {
+    return "No username";
+}
+
 }

@@ -130,10 +130,7 @@ public class ReinhartClientGUI extends Application
             disconnectbutton.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-            		// -- disconnect from the server
-            		client.disconnect();
-            		client = null;
-                	pane.requestFocus();
+
                 }
             });
 
