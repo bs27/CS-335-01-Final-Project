@@ -64,7 +64,7 @@ public class ClientGUI extends Application
             	System.exit(0);
             }
           });
-        
+
         // -- display the application window
         mainStage.show();
 
