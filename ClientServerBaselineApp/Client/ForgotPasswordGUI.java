@@ -17,7 +17,6 @@ public class ForgotPasswordGUI extends Application {
     Scene recoverPasswordGUI;
 
     private TextField username;
-    private TextField email;
 
     private Button toLoginPage;
     private Button toRegiPage;
@@ -28,7 +27,7 @@ public class ForgotPasswordGUI extends Application {
     public void start(Stage mainStage) throws Exception
     {
         username = new TextField();
-        email = new TextField();
+
         toLoginPage = new Button("Login Page");
         toRegiPage = new Button("to Registration Page");
         disconnect = new Button("Disconnect");
@@ -40,8 +39,6 @@ public class ForgotPasswordGUI extends Application {
         input.getChildren().add(new Label("~Recover Password~"));
         input.getChildren().add(new Label("Username"));
         input.getChildren().add(username);
-        input.getChildren().add(new Label("Email"));
-        input.getChildren().add(email);
         input.getChildren().add(submitRequest);
         root.setLeft(input);
         BorderPane.setMargin(input, new Insets(10));
@@ -54,15 +51,14 @@ public class ForgotPasswordGUI extends Application {
         links.getChildren().add(disconnect);
         root.setRight(links);
         BorderPane.setMargin(links, new Insets(10));
+
         root.setBottom(disconnect);
         BorderPane.setMargin(root.getBottom(), new Insets(10,10,10,WIDTH-100));
+
         recoverPasswordGUI = new Scene(root, WIDTH, HEIGHT);
         mainStage.setScene(recoverPasswordGUI);
         mainStage.show();
         root.requestFocus();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
