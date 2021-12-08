@@ -68,6 +68,17 @@ public class ClientGUI extends Application
     private Button playButton = new Button("Play Now!");
     private Button disconnect3 = new Button("Disconnect");
     private Button logout = new Button("Log Out");
+    //Change Login GUI
+    private Button updatePassword = new Button("Update Password");
+    private Button backToPostLogin = new Button("Back to Menu");
+    private Button disconnectBtn2 = new Button("Disconnect");
+    private TextField oldPasswordField = new TextField();
+    private TextField newPasswordField = new TextField();
+    private TextField verifyNewPasswordField = new TextField();
+    private Text changePassword = new Text("Change Password");
+    private Text oldPasswordText = new Text("Old Password");
+    private Text newPasswordText = new Text("New Password");
+    private Text verifyPasswordText = new Text("Verify New Password");
 
 
 
@@ -248,11 +259,6 @@ public class ClientGUI extends Application
                         errorIncorrectIPFormat.setVisible(true);
                     }
                     //Check for 256.256.256.256
-
-
-
-
-
                 }
             }
         });
@@ -334,6 +340,8 @@ public class ClientGUI extends Application
         changePasswordButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                mainStage.setScene(changePasswordGUI);
+
             }
         });
         disconnectBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -344,6 +352,77 @@ public class ClientGUI extends Application
                 client = null;
                 mainStage.setScene(connectGUI);
 
+            }
+        });
+
+
+
+
+
+        int maxwidth = 100;
+        oldPasswordField.setMaxWidth(maxwidth);
+        newPasswordField.setMaxWidth(maxwidth);
+        verifyNewPasswordField.setMaxWidth(maxwidth);
+        VBox cPlayout = new VBox(changePassword, oldPasswordText, oldPasswordField, newPasswordText, newPasswordField,verifyPasswordText,verifyNewPasswordField,updatePassword,backToPostLogin,disconnectBtn);
+        changePasswordGUI = new Scene(cPlayout);
+        updatePassword.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                String oldPassword = oldPasswordField.getText();
+                String newPassword = newPasswordField.getText();
+                String verifyNewPassword = verifyNewPasswordField.getText();
+
+                boolean success = true;
+
+                if(oldPassword.equals("") || newPassword.equals("") || verifyNewPassword.equals("")) {
+                    errorPopup("Empty Fields", "Enter your information in all fields");
+                    success = false;
+                }
+
+                if(!RegexValidation.validSimplePassword(newPassword)) {
+                    errorPopup("Invalid Password", "Password must be at least 8 characters long," +
+                            " have at least one digit, and have one upper or lower case letter");
+                    success = false;
+                }
+
+                if(oldPassword.equals(newPassword)) {
+                    errorPopup("Invalid Password", "New password cannot match old password");
+                    success = false;
+                }
+
+                if(!newPassword.equals(verifyNewPassword)) {
+                    errorPopup("Passwords do not match", "New password and verify new password must match");
+                    success = false;
+                }
+
+                if(success == true) {
+                    // updates password in database
+                    // refer to ben's loginPage
+                    // mainStage.setScene(loginGUI);
+                } else {
+                    // empty fields for change password (go back to changePassword scene)
+                    // mainStage.setScene(changePasswordGUI);
+                }
+
+            }
+        });
+
+        backToPostLogin.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // refer to ben's loginPage scene
+                mainStage.setScene(postLoginGUI);
+            }
+        });
+
+        disconnectBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
             }
         });
 
