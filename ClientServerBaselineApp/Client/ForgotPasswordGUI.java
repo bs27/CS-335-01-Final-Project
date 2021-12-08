@@ -23,7 +23,7 @@ public class ForgotPasswordGUI extends Application {
     private Button toRegiPage;
     private Button disconnect;
     private Button submitRequest;
-//this is a change
+
     @Override
     public void start(Stage mainStage) throws Exception
     {
