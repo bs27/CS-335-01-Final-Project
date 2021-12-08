@@ -9,7 +9,7 @@ public class EntryPoint {
 	//    https://github.com/javafxports/openjdk-jfx/issues/236#issuecomment-426583174
 	public static void main(String[] args) {
 		System.out.println("starting client");
-		new connectGUI().launchApp(args);
+		new ClientGUI().launchApp(args);
 	}
 
 }
