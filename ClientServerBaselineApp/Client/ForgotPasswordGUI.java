@@ -61,4 +61,8 @@ public class ForgotPasswordGUI extends Application {
         root.requestFocus();
     }
 
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

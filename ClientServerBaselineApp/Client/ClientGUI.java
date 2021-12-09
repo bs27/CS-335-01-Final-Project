@@ -1,7 +1,7 @@
 package Client;
 
 
-import com.sun.corba.se.impl.orb.ParserTable;
+//import com.sun.corba.se.impl.orb.ParserTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
-import javax.swing.*;
 import java.io.IOException;
 
 public class ClientGUI extends Application
@@ -55,7 +54,6 @@ public class ClientGUI extends Application
     private TextField emailField = new TextField();
     //Forgot/Recover Password
     private TextField username;
-    private TextField email;
     private Button toLoginPage;
     private Button toRegiPage;
     private Button disconnect2;
@@ -86,7 +84,7 @@ public class ClientGUI extends Application
 
 
     @Override
-    public void start(Stage mainStage) {
+    public void start(Stage mainStage){
 
         System.out.println("start");
         // -- Application title
@@ -128,14 +126,19 @@ public class ClientGUI extends Application
         //Recover Password GUI
         username = new TextField();
 
-
-
-        email = new TextField();
         toLoginPage = new Button("Login Page");
         toRegiPage = new Button("to Registration Page");
         disconnect2 = new Button("Disconnect");
 
         submitRequest = new Button("Submit");
+        submitRequest.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                System.out.println("ATTEMPTING TO RECOVER PASSWORD");
+                client.passwordRecovery(username.getText());
+            }
+        });
+
         BorderPane root = new BorderPane();
         // set up
         VBox input = new VBox();
@@ -143,8 +146,6 @@ public class ClientGUI extends Application
         input.getChildren().add(new Label("~Recover Password~"));
         input.getChildren().add(new Label("Username"));
         input.getChildren().add(username);
-        input.getChildren().add(new Label("Email"));
-        input.getChildren().add(email);
         input.getChildren().add(submitRequest);
         root.setLeft(input);
         BorderPane.setMargin(input, new Insets(10));
@@ -255,7 +256,7 @@ public class ClientGUI extends Application
                         mainStage.setTitle("Booked Blocks");
                         mainStage.setScene(loginGUI);
 
-                    }else {
+                    } else {
                         errorIncorrectIPFormat.setVisible(true);
                     }
                     //Check for 256.256.256.256

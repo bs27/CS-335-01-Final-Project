@@ -2,6 +2,8 @@ package Client;// -- download MySQL from: http://dev.mysql.com/downloads/
 //    Community Server version
 // -- Installation instructions are here: http://dev.mysql.com/doc/refman/5.7/en/installing.html
 // -- open MySQL Workbench to see the contents of the database
+import Common.User;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -22,13 +24,13 @@ public class DBaseConnection {
     // -- connect to the world database
     // -- this is the connector to the database, default port is 3306
 //    private String url = "jdbc:mysql://localhost:3306/world";
-    private String url = "jdbc:mysql://localhost:3306/new_schema";
+    private String url = "jdbc:mysql://localhost:3306/userdatabase";
     
     // -- this is the username/password, created during installation and in MySQL Workbench
     //    When you add a user make sure you give them the appropriate Administrative Roles
     //    (DBA sets all which works fine)
-    private static String username = "<<Your MySQL username>>";
-    private static String password = "<<Your MySQL password>>";
+    private static String username = "root";
+    private static String password = "ravenisdark32!";
 
     public DBaseConnection() {
     	try {
@@ -51,34 +53,26 @@ public class DBaseConnection {
 		}
     	
     }
-	public void accessDatabase() {
-		try {
-			String uname = "hello";
-			String pword = "world";
-			String email = "helloworld@gmail.com";
-			int lockcount = 3;
 
-            
-            // -- delete this record in case it exists
-            stmt.executeUpdate("DELETE FROM new_table WHERE username='ccreinhart';");
+    public User getUser(String username){
+    	try{
+			rset = stmt.executeQuery("SELECT * FROM user WHERE username='"+username+"';");
+			rset.next();
+			return new User(rset.getString("username"),rset.getString("password"),rset.getString("email"),rset.getInt("lockcount"));
+    	}
+    	catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+    	return new User("Nemo","Nihil","Null");
+	}
 
-            System.out.println("Original Contents");
-            rset = stmt.executeQuery("SELECT * FROM new_table;");
-            printResultSet(rset);
-           
-            // -- a query will return a ResultSet
-            // -- city is a table within the world database
-//            rset = stmt.executeQuery("SELECT * FROM city;");
-            System.out.println("Inserted Contents");
-            stmt.executeUpdate("INSERT INTO new_table VALUE('cHerberg', 'cHerberg1234', 'death@yahoo.com', 0);");
-            rset = stmt.executeQuery("SELECT * FROM new_table;");
-            printResultSet(rset);
-            
-            System.out.println("Updated Contents");
-            stmt.executeUpdate("UPDATE new_table SET lockcount=1 WHERE username='ccreinhart';");
-            rset = stmt.executeQuery("SELECT * FROM new_table;");
-            printResultSet(rset);            
-		} 
+	public void updateUserPassword(String username, String password){
+		try{
+			rset = stmt.executeQuery("UPDATE user SET user WHERE username='"+username+"';");
+		}
 		catch (SQLException ex) {
 			// handle any errors
 			System.out.println("SQLException: " + ex.getMessage());
@@ -90,20 +84,20 @@ public class DBaseConnection {
 	public void printResultSet(ResultSet rset)
 	{
 		try {
-	        // -- the metadata tells us how many columns in the data
+			// -- the metadata tells us how many columns in the data
 			ResultSetMetaData rsmd = rset.getMetaData();
-	        int numberOfColumns = rsmd.getColumnCount();
-	        System.out.println("columns: " + numberOfColumns);
-	        
-	        // -- loop through the ResultSet one row at a time
-	        //    Note that the ResultSet starts at index 1
-	        while (rset.next()) {
-	        	// -- loop through the columns of the ResultSet
-	        	for (int i = 1; i < numberOfColumns; ++i) {
-	        		System.out.print(rset.getString(i) + "\t");
-	        	}
-	        	System.out.println(rset.getString(numberOfColumns));
-	        }
+			int numberOfColumns = rsmd.getColumnCount();
+			System.out.println("columns: " + numberOfColumns);
+
+			// -- loop through the ResultSet one row at a time
+			//    Note that the ResultSet starts at index 1
+			while (rset.next()) {
+				// -- loop through the columns of the ResultSet
+				for (int i = 1; i < numberOfColumns; ++i) {
+					System.out.print(rset.getString(i) + "\t");
+				}
+				System.out.println(rset.getString(numberOfColumns));
+			}
 		}
 		catch (SQLException ex) {
 			// handle any errors
@@ -113,17 +107,13 @@ public class DBaseConnection {
 		}
 	}
 
-	
-	public static void main(String[] args) {
-
-		Scanner kb = new Scanner(System.in);
-		System.out.print("MySQL username: ");
-		username = kb.next();
-		System.out.print("MySQL password: ");
-		password = kb.next();
+	public static void main(String[] args) throws SQLException {
+		System.out.println("Test db");
 		
 		DBaseConnection dbc = new DBaseConnection();
-		dbc.accessDatabase();
+		// dbc.accessDatabase();
+		User test = dbc.getUser("cHerberg");
+		System.out.println(test.toString());
 	}
 
 }

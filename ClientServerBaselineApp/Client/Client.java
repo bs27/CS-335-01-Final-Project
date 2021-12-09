@@ -40,11 +40,8 @@ public class Client {
 	 * @param ip: the IP address of the server
 	 * @param port: the port on which the server is listening
 	 */
-	public Client (String ip, int port)
-	{
-
+	public Client (String ip, int port) {
 		networkaccess = new NetworkAccess(ip, port);
-
 	}
 
 
@@ -56,5 +53,16 @@ public class Client {
     	String text = "disconnect";
 		networkaccess.sendString(text,  false);
 		networkaccess.close();
+	}
+
+	public void passwordRecovery(String username) {
+		username = username.trim();
+		String request;
+		try{
+			networkaccess.sendString("passwordRecovery;"+username+";",true);
+		}
+		catch (Exception ex){
+			// System.err.println("Can't Send");
+		}
 	}
 }

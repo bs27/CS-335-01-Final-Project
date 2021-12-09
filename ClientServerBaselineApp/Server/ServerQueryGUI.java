@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
@@ -102,7 +101,4 @@ public class ServerQueryGUI extends Application {
         root.requestFocus();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
