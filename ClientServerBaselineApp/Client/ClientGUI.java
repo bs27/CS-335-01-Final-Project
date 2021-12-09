@@ -88,6 +88,7 @@ public class ClientGUI extends Application
     @Override
     public void start(Stage mainStage) {
 
+
         System.out.println("start");
         // -- Application title
         mainStage.setTitle("Connection Client");
@@ -118,6 +119,10 @@ public class ClientGUI extends Application
                 // -- if client is connected to the server, disconnect
                 //    before shutting down
                 if (client != null) {
+                    if (client.getUsername() != null){
+                        logoutnow();
+                        client.setUsername(null);
+                    }
                     client.disconnect();
                     client = null;
                 }
@@ -188,8 +193,7 @@ public class ClientGUI extends Application
         logout.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // DON't Forget to Logout
-                System.out.println("Don't forget to logout");
+                logoutnow();
                 mainStage.setScene(loginGUI);
 
             }
@@ -221,7 +225,9 @@ public class ClientGUI extends Application
                 boolean x = true;
                 String response = client.getNetworkAccess().sendString(message,x);
                 if(response.equals("Success")){
+                    client.setUsername(usernameField.getText());
                     mainStage.setScene(postLoginGUI);
+
                 }else {
                     if(response.equals("LockedOut")){
                         AlertBox.Display("Locked","This account has been locked. Please recover your password to continue");
@@ -392,6 +398,7 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
                 // -- disconnect from the server
+                logoutnow();
                 client.disconnect();
                 client = null;
                 mainStage.setScene(connectGUI);
@@ -464,6 +471,7 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent event) {
                 // -- disconnect from the server
+                logoutnow();
                 client.disconnect();
                 client = null;
                 mainStage.setScene(connectGUI);
@@ -472,6 +480,12 @@ public class ClientGUI extends Application
 
 
     }
+
+    private void logoutnow() {
+        client.getNetworkAccess().sendString("logout;"+client.getUsername(),false);
+        client.setUsername("");
+    }
+
     // -- launch the application
     public void launchApp(String[] args)
     {

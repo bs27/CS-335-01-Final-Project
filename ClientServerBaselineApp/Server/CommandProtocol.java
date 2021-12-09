@@ -95,6 +95,27 @@ public class CommandProtocol {
 					}
 				}
 		}
+		else if(cmd.contains("logout")){
+			DBaseConnection dbc = null;
+			String username = null;
+			String[] cmdList = cmd.split(";");
+			int count = 0;
+			for (String word : cmdList) {
+				if (count == 0) {
+					count++;
+					continue;
+				} else if (count == 1) {
+					username = word;
+					count++;
+				}
+			}
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			dbc.logout(username);
+		}
 		else if(cmd.contains("login")) {
 
 			int lockcount = 0;
@@ -127,6 +148,7 @@ public class CommandProtocol {
 					na.sendString("LockedOut",false);
 				}else {
 					if(dbc.passwordMatch(username,password)) {
+						dbc.login(username);
 						na.sendString("Success", false);
 					}else {
 						dbc.incrementLockCount(username);

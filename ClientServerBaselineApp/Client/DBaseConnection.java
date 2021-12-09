@@ -183,7 +183,7 @@ public class DBaseConnection {
 
 	public void addNewRecord(String username, String password, String email) throws SQLException {
 		try {
-			stmt.executeUpdate("INSERT INTO new_table VALUE('"+username+"','"+password+"','"+email+"', 0);");
+			stmt.executeUpdate("INSERT INTO new_table VALUE('"+username+"','"+password+"','"+email+"', 0,0);");
 		} catch (SQLException ex) {
 			// handle any errors
 			System.out.println("SQLException: " + ex.getMessage());
@@ -253,9 +253,32 @@ public class DBaseConnection {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
+    }
+		public void login(String username) {
+			try {
+				int newCount = 1;
+				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+
+			}catch (SQLException ex){
+				System.out.println("SQLException: " + ex.getMessage());
+				System.out.println("SQLState: " + ex.getSQLState());
+				System.out.println("VendorError: " + ex.getErrorCode());
+			}
 		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
-	}
-	public int numberOfRegisteredUsers(){
+			}
+		public void logout(String username) {
+			try {
+				int newCount = 0;
+				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+			}catch (SQLException ex){
+				System.out.println("SQLException: " + ex.getMessage());
+				System.out.println("SQLState: " + ex.getSQLState());
+				System.out.println("VendorError: " + ex.getErrorCode());
+			}
+			//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+		}
+
+		public int numberOfRegisteredUsers(){
 		try {
 			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table");
 			rset.next();
@@ -269,6 +292,135 @@ public class DBaseConnection {
 		}
 		return -1;
 	}
+	public String[] usersLockedOut(){
+		try {
+			int count = 0;
+			String[] usersLocked;
+			String usernameTBA = "";
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '3' = lockcount");
+			rset.next();
+			int numberOfUsersLockedOut = Integer.parseInt(rset.getString(1));
+			if (numberOfUsersLockedOut == 0){
+				usersLocked = new String[]{"NO USERS ARE LOCKED OUT HORRAY"};
+				return usersLocked;
+			}
+			usersLocked = new String[numberOfUsersLockedOut];
+			rset = stmt.executeQuery("SELECT * FROM new_table where '3' = lockcount");
+			while (rset.next()) {
+				// -- loop through the columns of the ResultSet
+				usernameTBA = rset.getString(1);
+				usersLocked[count] = usernameTBA;
+				count++;
+			}
+			return usersLocked;
 
 
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			String[] usersLocked = new String[]{"Error"};
+			return usersLocked;
+		}
+
+
+	}
+
+
+	public int numberOfLoggedInUsers() {
+		try {
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '1' = loggedin");
+			rset.next();
+			String registeredUsers = rset.getString(1);
+			return Integer.parseInt(registeredUsers);
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return -1;
+	}
+	public int numberOfLoggedOutUsers() {
+		try {
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '0' = loggedin");
+			rset.next();
+			String registeredUsers = rset.getString(1);
+			return Integer.parseInt(registeredUsers);
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return -1;
+	}
+	public String[] usersLoggedIn(){
+		try {
+			int count = 0;
+			String[] usersLoggedIn;
+			String usernameTBA = "";
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '1' = loggedin");
+			rset.next();
+			int numberOfUsersLoggedIn = Integer.parseInt(rset.getString(1));
+			if (numberOfUsersLoggedIn == 0){
+				usersLoggedIn = new String[]{"NO USERS ARE LOGGED IN"};
+				return usersLoggedIn;
+			}
+			usersLoggedIn = new String[numberOfUsersLoggedIn];
+			rset = stmt.executeQuery("SELECT * FROM new_table where '1' = loggedin");
+			while (rset.next()) {
+				// -- loop through the columns of the ResultSet
+				usernameTBA = rset.getString(1);
+				usersLoggedIn[count] = usernameTBA;
+				count++;
+			}
+			return usersLoggedIn;
+
+
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			String[] usersLocked = new String[]{"Error"};
+			return usersLocked;
+		}
+
+
+	}
+
+	public String[] getUsersLoggedOut() {
+		try {
+			int count = 0;
+			String[] usersLoggedOut;
+			String usernameTBA = "";
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '0' = loggedin");
+			rset.next();
+			int numberOfUsersLoggedOut = Integer.parseInt(rset.getString(1));
+			if (numberOfUsersLoggedOut == 0){
+				usersLoggedOut = new String[]{"NO USERS ARE LOGGED IN"};
+				return usersLoggedOut;
+			}
+			usersLoggedOut = new String[numberOfUsersLoggedOut];
+			rset = stmt.executeQuery("SELECT * FROM new_table where '0' = loggedin");
+			while (rset.next()) {
+				// -- loop through the columns of the ResultSet
+				usernameTBA = rset.getString(1);
+				usersLoggedOut[count] = usernameTBA;
+				count++;
+			}
+			return usersLoggedOut;
+
+
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			String[] usersLocked = new String[]{"Error"};
+			return usersLocked;
+		}
+	}
 }

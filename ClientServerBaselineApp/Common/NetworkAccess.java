@@ -14,6 +14,8 @@ public class NetworkAccess {
 	 * this is a peer-to-peer connection, either TCP/IP or UDP
 	 */
 	private Socket socket;
+	private String ipActual;
+	private int portActual;
 	
 	/**
 	 * stream variables for peer to peer communication
@@ -36,6 +38,8 @@ public class NetworkAccess {
 			//    check if the server is available and connects if it is,
 			//    if not throw an exception
 			socket = new Socket(ip, port);
+			setIpActual(ip);
+			setPortActual(port);
 			
 			// -- wrap the socket in stream I/O objects
 			//    these are for passing String types over the network
@@ -161,4 +165,19 @@ public class NetworkAccess {
 		}
 	}
 
+	public void setIpActual(String ipActual) {
+		this.ipActual = ipActual;
+	}
+
+	public void setPortActual(int portActual) {
+		this.portActual = portActual;
+	}
+
+	public int getPortActual() {
+		return portActual;
+	}
+
+	public String getIpActual() {
+		return ipActual;
+	}
 }

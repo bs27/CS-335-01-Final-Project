@@ -1,6 +1,8 @@
 package Server;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 
@@ -33,6 +35,9 @@ public class ClientHandler extends Thread {
 	 * the unique id of this client
 	 */
 	private int id;
+	private InetAddress IP;
+	private int IPAd;
+	private int Port;
 		
 	/**
 	 * a reference to the server that "has" this ClientHandler
@@ -47,12 +52,15 @@ public class ClientHandler extends Thread {
 	 * @param socket: the peer-to-peer socket for connection to the client
 	 * @param server: reference to the server that "has" this ClientHandler
 	 */
-	public ClientHandler (int id, Socket socket, Server server, ServerGUI gui) 
+	public ClientHandler (int id, Socket socket, Server server, ServerGUI gui,int IP)
 	{
 		this.server = server;
 		this.servergui = gui;
 		this.id = id;
 		this.name = Integer.toString(id);
+		this.IP = socket.getInetAddress();
+		this.IPAd = (IP);
+		this.Port = socket.getPort();
 		go = true;
 		
 		networkaccess = new NetworkAccess(socket);		
@@ -87,6 +95,10 @@ public class ClientHandler extends Thread {
 	public Server getServer()
 	{
 		return server;
+	}
+	public NetworkAccess getNet()
+	{
+		return networkaccess;
 	}
 	
 	// -- similar to a main() function in that it is the entry point of
@@ -124,7 +136,21 @@ public class ClientHandler extends Thread {
 				go = false;
 				
 			}
+
 			
 		}
+
+	}
+
+	public int getPort() {
+		return Port;
+	}
+
+	public int getIPAd() {
+		return IPAd;
+	}
+
+	public InetAddress getIP() {
+		return IP;
 	}
 }

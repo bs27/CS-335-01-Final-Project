@@ -60,9 +60,13 @@ public class Server extends Thread {
 	 */
 	private Vector<ClientHandler> clientconnections;
 	
-	public int getconnections ()
+	public int getconnectionsnum ()
 	{
 		return clientconnections.size();
+	}
+	public Vector<ClientHandler> getconnections ()
+	{
+		return clientconnections;
 	}
 	
 	/**
@@ -123,7 +127,7 @@ public class Server extends Thread {
 	public void peerconnection (Socket socket)
 	{		
 		// -- when a client arrives, create a thread for their communication
-		ClientHandler connection = new ClientHandler(nextId, socket, this, this.servergui);
+		ClientHandler connection = new ClientHandler(nextId, socket, this, this.servergui, 0);
 
 		// -- add the thread to the active client threads list
 		clientconnections.add(connection);

@@ -1,8 +1,11 @@
 package Client;
 
 import Common.NetworkAccess;
+import java.net.ServerSocket;
 
 public class Client {
+	private String username;
+
 
 	/*
 
@@ -56,5 +59,13 @@ public class Client {
     	String text = "disconnect";
 		networkaccess.sendString(text,  false);
 		networkaccess.close();
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 }
