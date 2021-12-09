@@ -19,14 +19,10 @@ public class SendEmailUsingGMailSMTP {
 
 	// -- You must have a valid gmail username/password pair to use
 	// gmail as a SMTP service
-	static private String username = "csc335booked@gmail.com";
+	static private String username = "csc335booked";
 	static private String password = "SEbooked!";
 
-	public static void main(String[] args) throws InterruptedException {
-
-	}
-
-	public static void sendPasswordEmail(String Semail, String Spassword) throws InterruptedException {
+	public static void sendPasswordEmail(String emailSend, String passwordSend) throws InterruptedException {
 		// -- set up host properties
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -46,7 +42,7 @@ public class SendEmailUsingGMailSMTP {
 		String from = username+"@gmail.com";
 
 		// -- Set up the recipient's email address
-		String to = Semail;
+		String to = emailSend;
 		int c = 0;
 		while(c < 5){
 			Thread.sleep(10000);
@@ -66,7 +62,7 @@ public class SendEmailUsingGMailSMTP {
 				message.setSubject("BooKeD Blocks - password recovery" + Character.toString((char) randomchar));
 
 				// Now set the actual message
-				message.setText("PASSWORD: "+Spassword);
+				message.setText("PASSWORD: "+passwordSend);
 
 				// -- Send message
 				// -- use either these three lines or...
