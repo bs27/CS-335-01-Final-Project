@@ -1,74 +1,120 @@
 package Client;
 
 
+import com.sun.corba.se.impl.orb.ParserTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+
+import javax.swing.*;
+import java.io.IOException;
 
 public class ClientGUI extends Application
 {
-	Client client = null;
+    Client client = null;
 
     int WIDTH = 256;
     int HEIGHT = 256;
 
-    private Scene mainScene;
+    Scene connectGUI;
+    Scene loginGUI;
+    Scene registrationGUI;
+    Scene recoverPasswordGUI;
+    Scene postLoginGUI;
+    Scene changePasswordGUI;
 
-    // -- Main container
-    private BorderPane pane;
+//Login GUI
+    Button submitButton = new Button("Submit");
+    Button forgotPassButton = new Button("Forgot your Password?");
+    Button registerButton = new Button("Register");
+    TextField usernameField = new TextField();
+    PasswordField passwordField = new PasswordField();
+    Button connectbutton = new Button("Connect");
+    private Button disconnect = new Button("Disconnect");
+//Connect GUI
+    Label enterIP = new Label("Enter IP Address Below");
+    TextField ipAddressField = new TextField("localhost");
+    Label errorIncorrectIPFormat = new Label("This isn't an IP Address DUMBASS!");
+    //Registration GUI
+    private Button registerButton2 = new Button("Submit");
+    private Button loginPageButton = new Button("Back to Login Page");
+    private Button disconnectBtn = new Button("Disconnect");
+    private TextField usernameField2 = new TextField("benjamin");
+    private PasswordField passwordField2 = new PasswordField();
+    private TextField emailField = new TextField("bsottile@callutheran.edu");
+    //Forgot/Recover Password
+    private TextField username;
+    private TextField email;
+    private Button toLoginPage;
+    private Button toRegiPage;
+    private Button disconnect2;
+    private Button submitRequest;
+    //Post Login GUI
+    private Label welcomeMesAGE = new Label("Welcome to Booked Blocks! " + getUsername());
+    private Button highScoresButton = new Button("High Scores");
+    private Button howToPlayButton = new Button("How to Play");
+    private Button changePasswordButton = new Button("Change Password");
+    private Button playButton = new Button("Play Now!");
+    private Button disconnect3 = new Button("Disconnect");
+    private Button logout = new Button("Log Out");
+    //Change Login GUI
+    private Button updatePassword = new Button("Update Password");
+    private Button backToPostLogin = new Button("Back to Menu");
+    private Button disconnectBtn2 = new Button("Disconnect");
+    private TextField oldPasswordField = new TextField();
+    private TextField newPasswordField = new TextField();
+    private TextField verifyNewPasswordField = new TextField();
+    private Text changePassword = new Text("Change Password");
+    private Text oldPasswordText = new Text("Old Password");
+    private Text newPasswordText = new Text("New Password");
+    private Text verifyPasswordText = new Text("Verify New Password");
 
-    // -- Controls container
-    private ControlBoxInner controlBox;
+
+
+
+
 
     @Override
-    public void start(Stage mainStage)
-    {
-    	System.out.println("start");
-    	// -- Application title
-        mainStage.setTitle("JavaFX Graphics Application");
+    public void start(Stage mainStage) {
+
+        System.out.println("start");
+        // -- Application title
+        mainStage.setTitle("Connection Client");
         mainStage.setWidth(WIDTH);
+        connectGUI = new Scene(new VBox(enterIP,ipAddressField,connectbutton,errorIncorrectIPFormat));
+        errorIncorrectIPFormat.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
+        errorIncorrectIPFormat.setVisible(false);
 
-    	// -- construct the controls
-    	controlBox = new ControlBoxInner();
+        mainStage.setScene(connectGUI);
+        // -- display the aplication window
+        mainStage.show();
+        disconnect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
 
-        // -- create the primary window structure
-        pane = new BorderPane();
+            }
+        });
 
-    	// -- add the graphics canvas and the control box to the Border Pane
-        pane.setLeft(controlBox);
-
-        mainScene = new Scene(pane);
-        mainStage.setScene(mainScene);
 
         // -- clean up on close
         mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent e) {
-<<<<<<< Updated upstream
-            	// -- if client is connected to the server, disconnect
-            	//    before shutting down
-            	if (client != null) {
-            		client.disconnect();
-            		client = null;
-            	}
-            	Platform.exit();
-            	System.exit(0);
-            }
-          });
-
-        // -- display the application window
-        mainStage.show();
-=======
                 // -- if client is connected to the server, disconnect
                 //    before shutting down
                 if (client != null) {
@@ -257,7 +303,19 @@ public class ClientGUI extends Application
                     AlertBox.Display("Error!",errorString);
                 }else {
                     String stringToSend = "register" + ";" + username + ";" + password + ";" + email;
-                    client.getNetworkAccess().sendString(stringToSend,false);
+                    String rtnString = client.getNetworkAccess().sendString(stringToSend,true);
+                    if(rtnString.equals("SUCCESS")){
+                        AlertBox.Display("Success", "New Account Successfully Created");
+                        mainStage.setScene(loginGUI);
+                    }else if (rtnString.equals("FAIL11")){
+                        AlertBox.Display("Error!","This Email and Username have already been registered");
+                    }else if (rtnString.equals("FAIL01")){
+                        AlertBox.Display("Error!","This email has already been registered");
+                    }else if(rtnString.equals("FAIL10")){
+                        AlertBox.Display("Error!","This username has already been registered");
+                    }else {
+                        AlertBox.Display("Uh-oh","Some broke...sorry - Ben");
+                    }
                 }
 
 
@@ -319,52 +377,40 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
                 mainStage.setScene(changePasswordGUI);
->>>>>>> Stashed changes
 
-        // -- set keyboard focus to the pane
-        pane.requestFocus();
+            }
+        });
+        disconnectBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
 
-    }
+            }
+        });
 
 
-    // -- launch the application
-    public void launchApp(String[] args)
-    {
-    	System.out.println("launch");
-        launch(args);
-    }
 
 
-    // -- Inner class for Controls
-    public class ControlBoxInner extends VBox {
 
-        private Button disconnectbutton = new Button("Disconnect");
-        private Button connectbutton = new Button("Connect");
-        private Button messagebutton = new Button("Send Message");
+        int maxwidth = 100;
+        oldPasswordField.setMaxWidth(maxwidth);
+        newPasswordField.setMaxWidth(maxwidth);
+        verifyNewPasswordField.setMaxWidth(maxwidth);
+        VBox cPlayout = new VBox(changePassword, oldPasswordText, oldPasswordField, newPasswordText, newPasswordField,verifyPasswordText,verifyNewPasswordField,updatePassword,backToPostLogin,disconnectBtn);
+        changePasswordGUI = new Scene(cPlayout);
+        updatePassword.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
 
-        private TextField messagefield = new TextField();
-        private TextArea responsearea = new TextArea();
+                String oldPassword = oldPasswordField.getText();
+                String newPassword = newPasswordField.getText();
+                String verifyNewPassword = verifyNewPasswordField.getText();
 
-<<<<<<< Updated upstream
-        public ControlBoxInner()
-        {
-        	super();
+                boolean success = true;
 
-        	// -- create button handlers
-            messagebutton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-
-            		// -- send message to server and receive reply.
-            		String commandString;
-            		String replyString;
-
-           			// -- send a String to the server and wait for the response
-           			commandString = messagefield.getText();
-           			System.out.println("CLIENT send:  " + commandString);
-           			replyString = client.getNetworkAccess().sendString(commandString, true);
-           			responsearea.appendText("CLIENT receive: " + replyString + "\n");
-=======
                 if(oldPassword.equals("") || newPassword.equals("") || verifyNewPassword.equals("")) {
                     AlertBox.Display("Empty Fields", "Enter your information in all fields");
                     success = false;
@@ -384,47 +430,68 @@ public class ClientGUI extends Application
                 if(!newPassword.equals(verifyNewPassword)) {
                     AlertBox.Display("Passwords do not match", "New password and verify new password must match");
                     success = false;
->>>>>>> Stashed changes
                 }
-            });
 
-            connectbutton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-                	// -- do not allow a client to connect multiple times
-                	if (client == null) {
-	            		String host = "127.0.0.1";// "192.168.1.8";//"127.0.0.1";
-	            		int port = 8000;
-	            		// -- instantiate a Client object
-	            		//    the constructor will attempt to connect to the server
-	            		client = new Client(host, port);
-                	}
+                if(success == true) {
+                    // updates password in database
+                    // refer to ben's loginPage
+                    // mainStage.setScene(loginGUI);
+                } else {
+                    // empty fields for change password (go back to changePassword scene)
+                    // mainStage.setScene(changePasswordGUI);
                 }
-            });
 
-            disconnectbutton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-            		// -- disconnect from the server
-            		client.disconnect();
-            		client = null;
-                	pane.requestFocus();
+            }
+        });
+
+        backToPostLogin.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // refer to ben's loginPage scene
+                mainStage.setScene(postLoginGUI);
+            }
+        });
+
+        disconnectBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // -- disconnect from the server
+                client.disconnect();
+                client = null;
+                mainStage.setScene(connectGUI);
+            }
+        });
+
+
+    }
+    // -- launch the application
+    public void launchApp(String[] args)
+    {
+        System.out.println("launch");
+        launch(args);
+    }
+    private boolean checkIP(String host) {
+        try {
+            String[] ipArray = host.split("\\.");
+            for(int i = 0; i<=3; i++){
+                if ((Integer.parseInt(ipArray[i])) <= 256 && (Integer.parseInt(ipArray[i]) >= 0)){
+                    continue;
+                }else {
+                    return false;
                 }
-            });
 
-            // -- build a simple GUI
-            int maxwidth = 100;
-            messagefield.setMaxWidth(maxwidth);
-            responsearea.setMaxWidth(maxwidth);
-            responsearea.setMaxHeight(200);
-    		this.getChildren().add(connectbutton);
-            this.getChildren().add(disconnectbutton);
-    		this.getChildren().add(messagebutton);
-            this.getChildren().add(new Label("Message"));
-    		this.getChildren().add(messagefield);
-            this.getChildren().add(new Label("Response"));
-    		this.getChildren().add(responsearea);
-
+            }
+            return true;
+        }catch (Exception e){
+            return false;
         }
-     }
+    }
+    public void errorPopup (String title, String contentText) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle(title);
+        error.setContentText(contentText);
+    }private String getUsername() {
+    return "No username";
+}
+
 }

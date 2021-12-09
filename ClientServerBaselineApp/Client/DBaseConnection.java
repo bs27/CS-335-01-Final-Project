@@ -51,6 +51,29 @@ public class DBaseConnection {
 		}
     	
     }
+	public DBaseConnection(String username1, String password2) {
+		try {
+			this.username = username1;
+			this.password = password2;
+			// -- make the connection to the database
+			conn = DriverManager.getConnection(url, username, password);
+
+			// -- These will be used to send queries to the database
+			stmt = conn.createStatement();
+			rset = stmt.executeQuery("SELECT VERSION()");
+
+			if (rset.next()) {
+				System.out.println("MySQL version: " + rset.getString(1) + "\n=====================\n");
+			}
+		}
+		catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+
+	}
 	public void accessDatabase() {
 		try {
 			String uname = "hello";
@@ -133,7 +156,41 @@ public class DBaseConnection {
 		dbc.accessDatabase();
 	}
 
-	public boolean exists(String field, String search) {
-    	return false;
+	public int exists(String field, String search) throws SQLException {
+    	try {
+    		System.out.println("SELECT COUNT(1) FROM new_table WHERE '" + search + "' = " + field);
+			rset = stmt.executeQuery("SELECT COUNT(1) FROM new_table WHERE '" + search + "' = " + field);
+			ResultSetMetaData rsmd = rset.getMetaData();
+			int numberOfColumns = rsmd.getColumnCount();
+			rset.next();
+			System.out.println(rset.getString(1));
+
+			if (Integer.parseInt(rset.getString(1)) == 0){
+				return 0;
+			}else if(Integer.parseInt(rset.getString(1)) == 1){
+				return 1;
+			}else {
+				return 2;
+			}
+		}catch (SQLException ex){
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return 2;
+	}
+
+	public void addNewRecord(String username, String password, String email) throws SQLException {
+		try {
+			stmt.executeUpdate("INSERT INTO new_table VALUE('"+username+"','"+password+"','"+email+"', 0);");
+		} catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
 	}
 }

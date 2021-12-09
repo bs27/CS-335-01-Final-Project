@@ -7,6 +7,7 @@ package Server;
 //Tuesday
 //Wednesday Use bootcamp code switch
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -36,11 +37,7 @@ public class CommandProtocol {
 	 * @param ch: ClientHandler object requesting the processing
 	 * @return
 	 */
-	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch)
-
-
-
-	{
+	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch) throws SQLException {
 		if (cmd.equals("disconnect")) {
 
 			// -- no response to the client is necessary
@@ -55,32 +52,49 @@ public class CommandProtocol {
 			
 		}
 		else if (cmd.contains("register")){
-			String username;
-			String password;
-			String email;
+			DBaseConnection dbc = null;
+			String username = null;
+			String password = null;
+			String email= null;
 			String[] cmdList = cmd.split(";");
 			int count = 0;
 			for (String word : cmdList) {
-				if(count == 0){
+				if (count == 0) {
 					count++;
 					continue;
-				}else if (count == 1){
+				} else if (count == 1) {
 					username = word;
 					count++;
-				}else if(count == 2){
+				} else if (count == 2) {
 					password = word;
 					count++;
-				}else if(count == 3){
+				} else if (count == 3) {
 					email = word;
 				}
-				DBaseConnection dbc = new DBaseConnection();
-				dbc.exists();
 			}
-
+				if(System.getProperty("user.name").equals("bjsot")){
+					dbc = new DBaseConnection("root","?Vagus39");
+				} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+					dbc = new DBaseConnection("root", "ravenisdark32!");
+				}
+				int usernameExists = dbc.exists( "username", username);
+				int emailExists = dbc.exists("email",email);
+				if(usernameExists == 0 && emailExists == 0){
+					dbc.addNewRecord(username,password,email);
+					na.sendString("SUCCESS",false);
+				}else {
+					if(usernameExists == 1 && emailExists == 1){
+						na.sendString("FAIL11",false);
+					}else if(usernameExists == 0 && emailExists == 1){
+						na.sendString("FAIL01",false);
+					}else if(usernameExists == 1 && emailExists == 0){
+						na.sendString("FAIL10",false);
+					}
+				}
 		}
 		else {
 			na.sendString(cmd + "\n", false);
 			
 		}		
-	}
-}
+	}}
+

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="activation1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/BootCampLibraries/activation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/BootCampLibraries/javax.mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/BootCampLibraries/mysql-connector-java-8.0.27.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
