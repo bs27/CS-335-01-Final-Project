@@ -255,6 +255,20 @@ public class DBaseConnection {
 		}
 		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
 	}
+	public int numberOfRegisteredUsers(){
+		try {
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table");
+			rset.next();
+			String registeredUsers = rset.getString(1);
+			return Integer.parseInt(registeredUsers);
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return -1;
+	}
 
 
 }

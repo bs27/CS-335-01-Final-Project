@@ -96,6 +96,7 @@ public class CommandProtocol {
 				}
 		}
 		else if(cmd.contains("login")) {
+
 			int lockcount = 0;
 			DBaseConnection dbc = null;
 			String username = null;
