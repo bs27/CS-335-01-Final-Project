@@ -50,13 +50,13 @@ public class CommandProtocol {
 		else if (cmdArr[0].equals("passwordRecovery")){ // passwordRecovery;USERNAME\n
 			DBaseConnection dBaseConnection = new DBaseConnection();
 			User user = dBaseConnection.getUser(cmdArr[1]);
-			System.out.println(user.getLockCount());
 			if(user.isLocked()){
 				try {
 					// new password
 					String tempPass = "tempPass12343";
 					// update
 					dBaseConnection.updateUserStringData(user.getUsername(), "password", tempPass);
+					dBaseConnection.updateUserIntData(user.getUsername(), "lockcount", 0);
 					// send
 					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
 				}
@@ -67,6 +67,7 @@ public class CommandProtocol {
 			else{
 				try {
 					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
+
 				}
 				catch (InterruptedException ex){
 

@@ -57,7 +57,7 @@ public class SendEmailUsingGMailSMTP {
 				int randomchar = ((int)(Math.random() * 25) + 52);
 
 				// -- Set Subject: header field
-				message.setSubject("BooKeD Blocks - password recovery" + Character.toString((char) randomchar));
+				message.setSubject("BooKeD Blocks - Password Recovery");
 
 				// Now set the actual message
 				message.setText("PASSWORD: "+passwordSend);
