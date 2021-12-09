@@ -23,8 +23,8 @@ public class ClientGUI extends Application
 {
     Client client = null;
 
-    int WIDTH = 256;
-    int HEIGHT = 256;
+    int WIDTH = 400;
+    int HEIGHT = 400;
 
     Scene connectGUI;
     Scene loginGUI;
@@ -33,7 +33,7 @@ public class ClientGUI extends Application
     Scene postLoginGUI;
     Scene changePasswordGUI;
 
-//Login GUI
+    //Login GUI
     Button submitButton = new Button("Submit");
     Button forgotPassButton = new Button("Forgot your Password?");
     Button registerButton = new Button("Register");
@@ -41,9 +41,9 @@ public class ClientGUI extends Application
     PasswordField passwordField = new PasswordField();
     Button connectbutton = new Button("Connect");
     private Button disconnect = new Button("Disconnect");
-//Connect GUI
+    //Connect GUI
     Label enterIP = new Label("Enter IP Address Below");
-    TextField ipAddressField = new TextField("0.0.0.0");
+    TextField ipAddressField = new TextField("localhost");
     Label errorIncorrectIPFormat = new Label("This isn't an IP Address DUMBASS!");
     //Registration GUI
     private Button registerButton2 = new Button("Submit");
@@ -54,6 +54,7 @@ public class ClientGUI extends Application
     private TextField emailField = new TextField();
     //Forgot/Recover Password
     private TextField username;
+    private TextField email;
     private Button toLoginPage;
     private Button toRegiPage;
     private Button disconnect2;
@@ -78,13 +79,8 @@ public class ClientGUI extends Application
     private Text newPasswordText = new Text("New Password");
     private Text verifyPasswordText = new Text("Verify New Password");
 
-
-
-
-
-
     @Override
-    public void start(Stage mainStage){
+    public void start(Stage mainStage) {
 
         System.out.println("start");
         // -- Application title
@@ -107,6 +103,7 @@ public class ClientGUI extends Application
 
             }
         });
+
 
 
         // -- clean up on close
@@ -183,7 +180,6 @@ public class ClientGUI extends Application
                 client.disconnect();
                 client = null;
                 mainStage.setScene(connectGUI);
-
             }
         });
         logout.setOnAction(new EventHandler<ActionEvent>() {
@@ -218,18 +214,22 @@ public class ClientGUI extends Application
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                String message = "signIn/"+usernameField.getText()+","+passwordField.getText();
+                String message = "login;"+usernameField.getText()+";"+passwordField.getText();
                 boolean x = true;
-
                 String response = client.getNetworkAccess().sendString(message,x);
-                System.out.println(response+"No sign in implemented");
-                mainStage.setScene(postLoginGUI);
+                if(response.equals("Success")){
+                    mainStage.setScene(postLoginGUI);
+                }else {
+                    if(response.equals("LockedOut")){
+                        AlertBox.Display("Locked","This account has been locked. Please recover your password to continue");
+                    }else if(response.equals("IncorrectPassword")){
+                        AlertBox.Display("Login Failed","Incorrect Username and/or password");
+                    }
 
-
-
-
+                }
             }
         });
+
 
         // -- clean up on close
         connectbutton.setOnAction(new EventHandler<ActionEvent>() {
@@ -270,24 +270,54 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
                 String email = emailField.getText();
-                String username = usernameField.getText();
-                String password = passwordField.getText();
+                String username = usernameField2.getText();
+                String password = passwordField2.getText();
 
                 // Unsuccessful registration:
-                if(email.equals("") || username.equals("") || password.equals("")) {
-                    errorPopup("Empty fields", "Enter your registration information in all fields");
+                boolean flag = false;
+                String errorString = "Please correct the following issues with your registration:" + "\n";
+                if(username.equals("")){
+                    errorString = errorString + "No username inputted \n";
+                    flag = true;
                 }
-
-                if(!RegexValidation.validEmailAddress(email)) {
-                    errorPopup("Invalid Email Address", "Please enter a valid email address");
+                if(password.equals("")) {
+                    errorString = errorString + "No password inputted \n";
+                    flag = true;
+                }else {
+                    if (!RegexValidation.validSimplePassword(password)) {
+                        flag = true;
+                        errorString = errorString + "Password must be at least 8 characters long,\n" +
+                                "have at least one digit, and have one upper or lower case letter\n";
+                    }
                 }
+                if (email.equals("")) {
+                    flag = true;
+                    errorString = errorString + "No email inputted \n";
+                }else {
+                    if (!RegexValidation.validEmailAddress(email)) {
+                        flag = true;
+                        errorString = errorString + "Please enter a valid email address \n";
+                    }
 
-                if(!RegexValidation.validSimplePassword(password)) {
-                    errorPopup("Invalid Password",
-                            "Password must be at least 8 characters long," +
-                                    " have at least one digit, and have one upper or lower case letter");
                 }
-
+                if (flag){
+                    AlertBox.Display("Error!",errorString);
+                }else {
+                    String stringToSend = "register" + ";" + username + ";" + password + ";" + email;
+                    String rtnString = client.getNetworkAccess().sendString(stringToSend,true);
+                    if(rtnString.equals("SUCCESS")){
+                        AlertBox.Display("Success", "New Account Successfully Created");
+                        mainStage.setScene(loginGUI);
+                    }else if (rtnString.equals("FAIL11")){
+                        AlertBox.Display("Error!","This Email and Username have already been registered");
+                    }else if (rtnString.equals("FAIL01")){
+                        AlertBox.Display("Error!","This email has already been registered");
+                    }else if(rtnString.equals("FAIL10")){
+                        AlertBox.Display("Error!","This username has already been registered");
+                    }else {
+                        AlertBox.Display("Uh-oh","Some broke...sorry - Ben");
+                    }
+                }
                 // Successful Registration: Send email, username, password to database
                 // Then, go back to login page (refer to ben's login page scene)
 

@@ -54,6 +54,99 @@ public class DBaseConnection {
     	
     }
 
+	public DBaseConnection(String username1, String password2) {
+		try {
+			this.username = username1;
+			this.password = password2;
+			// -- make the connection to the database
+			conn = DriverManager.getConnection(url, username, password);
+
+			// -- These will be used to send queries to the database
+			stmt = conn.createStatement();
+			rset = stmt.executeQuery("SELECT VERSION()");
+
+			if (rset.next()) {
+				//System.out.println("MySQL version: " + rset.getString(1) + "\n=====================\n");
+			}
+		}
+		catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+
+	}
+
+	public void accessDatabase() {
+		try {
+			String uname = "hello";
+			String pword = "world";
+			String email = "helloworld@gmail.com";
+			int lockcount = 3;
+
+
+			// -- delete this record in case it exists
+			stmt.executeUpdate("DELETE FROM new_table WHERE username='ccreinhart';");
+
+			System.out.println("Original Contents");
+			rset = stmt.executeQuery("SELECT * FROM new_table;");
+			printResultSet(rset);
+
+			//Find username code
+			rset = stmt.executeQuery("SELECT COUNT(1) FROM new_table WHERE 'ben Sottile' = username");
+			printResultSet(rset);
+
+
+
+			// -- a query will return a ResultSet
+			// -- city is a table within the world database
+//            rset = stmt.executeQuery("SELECT * FROM city;");
+			System.out.println("Inserted Contents");
+			stmt.executeUpdate("INSERT INTO new_table VALUE('ben Sottile', 'cHerberg1234', 'death@yahoo.com', 0);");
+			rset = stmt.executeQuery("SELECT * FROM new_table;");
+			printResultSet(rset);
+
+			System.out.println("Updated Contents");
+			stmt.executeUpdate("UPDATE new_table SET lockcount=1 WHERE username='ccreinhart';");
+			rset = stmt.executeQuery("SELECT * FROM new_table;");
+			printResultSet(rset);
+		}
+		catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+
+	public void printResultSet(ResultSet rset)
+	{
+		try {
+			// -- the metadata tells us how many columns in the data
+			ResultSetMetaData rsmd = rset.getMetaData();
+			int numberOfColumns = rsmd.getColumnCount();
+//	        System.out.println("columns: " + numberOfColumns);
+
+			// -- loop through the ResultSet one row at a time
+			//    Note that the ResultSet starts at index 1
+			while (rset.next()) {
+				// -- loop through the columns of the ResultSet
+				for (int i = 1; i < numberOfColumns; ++i) {
+					System.out.print(rset.getString(i) + "\t");
+				}
+				System.out.println(rset.getString(numberOfColumns));
+			}
+
+		}
+		catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+
     public User getUser(String username){
     	try{
 			rset = stmt.executeQuery("SELECT * FROM new_table WHERE username='"+username+"';");
@@ -169,13 +262,43 @@ public class DBaseConnection {
 
 	}
 
-	public static void main(String[] args) throws SQLException {
-		System.out.println("Test db");
-		
-		DBaseConnection dbc = new DBaseConnection();
-		// dbc.accessDatabase();
-		User test = dbc.getUser("cHerberg");
-		System.out.println(test.toString());
-	}
+	public void incrementLockCount(String username) {
+		try {
+			int original = getLockCount(username);
+			int newCount = original + 1;
+			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
 
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+	}
+	public void resetLockCount(String username) {
+		try {
+			int newCount = 0;
+			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+	}
+	public int numberOfRegisteredUsers(){
+		try {
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table");
+			rset.next();
+			String registeredUsers = rset.getString(1);
+			return Integer.parseInt(registeredUsers);
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return -1;
+	}
 }

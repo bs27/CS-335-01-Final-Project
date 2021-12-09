@@ -2,6 +2,7 @@ package Server;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 
 import Common.NetworkAccess;
 
@@ -117,7 +118,7 @@ public class ClientHandler extends Thread {
 				this.servergui.addToTextArea(cmd);
 				CommandProtocol.processCommand(cmd, networkaccess, this);
 			} 
-			catch (IOException e) {
+			catch (IOException | SQLException e) {
 				
 				e.printStackTrace();
 				go = false;

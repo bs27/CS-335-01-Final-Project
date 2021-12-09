@@ -38,14 +38,54 @@ public class CommandProtocol {
 	 * @param ch: ClientHandler object requesting the processing
 	 * @return
 	 */
-	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch)
-	{
+	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch) throws SQLException {
 		String[] cmdArr = cmd.split(";");
 		if (cmd.equals("disconnect")) {
 			// -- no response to the client is necessary
 			na.close();
 			ch.getServer().removeID(ch.getID());
 			ch.Stop();
+		}
+		else if (cmd.contains("register")){
+			DBaseConnection dbc = null;
+			String username = null;
+			String password = null;
+			String email= null;
+			String[] cmdList = cmd.split(";");
+			int count = 0;
+			for (String word : cmdList) {
+				if (count == 0) {
+					count++;
+					continue;
+				} else if (count == 1) {
+					username = word;
+					count++;
+				} else if (count == 2) {
+					password = word;
+					count++;
+				} else if (count == 3) {
+					email = word;
+				}
+			}
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			int usernameExists = dbc.exists( "username", username);
+			int emailExists = dbc.exists("email",email);
+			if(usernameExists == 0 && emailExists == 0){
+				dbc.addNewRecord(username,password,email);
+				na.sendString("SUCCESS",false);
+			}else {
+				if(usernameExists == 1 && emailExists == 1){
+					na.sendString("FAIL11",false);
+				}else if(usernameExists == 0 && emailExists == 1){
+					na.sendString("FAIL01",false);
+				}else if(usernameExists == 1 && emailExists == 0){
+					na.sendString("FAIL10",false);
+				}
+			}
 		}
 		else if (cmdArr[0].equals("passwordRecovery")){ // passwordRecovery;USERNAME\n
 			DBaseConnection dBaseConnection = new DBaseConnection();
@@ -74,6 +114,48 @@ public class CommandProtocol {
 				}
 			}
 			na.sendString("If username is valid, your password has been sent to the email on record", false);
+		}
+		else if(cmd.contains("login")) {
+			int lockcount = 0;
+			DBaseConnection dbc = null;
+			String username = null;
+			String password = null;
+			String[] cmdList = cmd.split(";");
+			int count = 0;
+			for (String word : cmdList) {
+				if (count == 0) {
+					count++;
+					continue;
+				} else if (count == 1) {
+					username = word;
+					count++;
+				} else if (count == 2) {
+					password = word;
+					count++;
+				}
+			}
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			int usernameExists = dbc.exists( "username", username);
+			if(usernameExists == 1){
+				lockcount = dbc.getLockCount(username);
+				if(lockcount >= 3){
+					na.sendString("LockedOut",false);
+				}else {
+					if(dbc.passwordMatch(username,password)) {
+						na.sendString("Success", false);
+					}else {
+						dbc.incrementLockCount(username);
+						na.sendString("IncorrectPassword", false);
+					}
+				}
+			} else {
+				na.sendString("IncorrectPassword", false);
+			}
+
 		}
 		else {
 			
