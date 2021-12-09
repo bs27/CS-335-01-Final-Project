@@ -11,8 +11,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 
+import Client.AlertBox;
 import Client.DBaseConnection;
 import Common.NetworkAccess;
+import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
+import sun.applet.Main;
 
 /**
  * @author reinhart
@@ -92,7 +95,48 @@ public class CommandProtocol {
 					}
 				}
 		}
-		else {
+		else if(cmd.contains("login")) {
+			int lockcount = 0;
+			DBaseConnection dbc = null;
+			String username = null;
+			String password = null;
+			String[] cmdList = cmd.split(";");
+			int count = 0;
+			for (String word : cmdList) {
+				if (count == 0) {
+					count++;
+					continue;
+				} else if (count == 1) {
+					username = word;
+					count++;
+				} else if (count == 2) {
+					password = word;
+					count++;
+				}
+			}
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			int usernameExists = dbc.exists( "username", username);
+			if(usernameExists == 1){
+				lockcount = dbc.getLockCount(username);
+				if(lockcount >= 3){
+					na.sendString("LockedOut",false);
+				}else {
+					if(dbc.passwordMatch(username,password)) {
+						na.sendString("Success", false);
+					}else {
+						dbc.incrementLockCount(username);
+						na.sendString("IncorrectPassword", false);
+					}
+				}
+			}else {
+				na.sendString("IncorrectPassword", false);
+			}
+
+		}else {
 			na.sendString(cmd + "\n", false);
 			
 		}		

@@ -50,9 +50,9 @@ public class ClientGUI extends Application
     private Button registerButton2 = new Button("Submit");
     private Button loginPageButton = new Button("Back to Login Page");
     private Button disconnectBtn = new Button("Disconnect");
-    private TextField usernameField2 = new TextField("benjamin");
+    private TextField usernameField2 = new TextField();
     private PasswordField passwordField2 = new PasswordField();
-    private TextField emailField = new TextField("bsottile@callutheran.edu");
+    private TextField emailField = new TextField();
     //Forgot/Recover Password
     private TextField username;
     private TextField email;
@@ -217,12 +217,20 @@ public class ClientGUI extends Application
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                String message = "signIn/"+usernameField.getText()+","+passwordField.getText();
+                String message = "login;"+usernameField.getText()+";"+passwordField.getText();
                 boolean x = true;
-
                 String response = client.getNetworkAccess().sendString(message,x);
-                System.out.println(response+"No sign in implemented");
-                mainStage.setScene(postLoginGUI);
+                if(response.equals("Success")){
+                    mainStage.setScene(postLoginGUI);
+                }else {
+                    if(response.equals("LockedOut")){
+                        AlertBox.Display("Locked","This account has been locked. Please recover your password to continue");
+                    }else if(response.equals("IncorrectPassword")){
+                        AlertBox.Display("Login Failed","Incorrect Username and/or password");
+                    }
+
+                }
+
 
 
 

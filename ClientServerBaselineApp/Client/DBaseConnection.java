@@ -63,7 +63,7 @@ public class DBaseConnection {
 			rset = stmt.executeQuery("SELECT VERSION()");
 
 			if (rset.next()) {
-				System.out.println("MySQL version: " + rset.getString(1) + "\n=====================\n");
+				//System.out.println("MySQL version: " + rset.getString(1) + "\n=====================\n");
 			}
 		}
 		catch (SQLException ex) {
@@ -158,12 +158,10 @@ public class DBaseConnection {
 
 	public int exists(String field, String search) throws SQLException {
     	try {
-    		System.out.println("SELECT COUNT(1) FROM new_table WHERE '" + search + "' = " + field);
 			rset = stmt.executeQuery("SELECT COUNT(1) FROM new_table WHERE '" + search + "' = " + field);
 			ResultSetMetaData rsmd = rset.getMetaData();
 			int numberOfColumns = rsmd.getColumnCount();
 			rset.next();
-			System.out.println(rset.getString(1));
 
 			if (Integer.parseInt(rset.getString(1)) == 0){
 				return 0;
@@ -193,4 +191,70 @@ public class DBaseConnection {
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
 	}
+//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+	public int getLockCount(String username) throws SQLException {
+    	try {
+    		int lockcount = -1;
+			rset = stmt.executeQuery("SELECT * FROM new_table WHERE '"+username+"' = username");
+			rset.next();
+			lockcount = Integer.parseInt(rset.getString(4));
+			return lockcount;
+
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			return -2;
+		}
+	}
+
+	public boolean passwordMatch(String username, String password) throws SQLException {
+    	try {
+			int lockcount = -1;
+			rset = stmt.executeQuery("SELECT * FROM new_table WHERE '" + username + "' = username");
+			rset.next();
+			String truePass = rset.getString(2);
+			if(truePass.equals(password)){
+				return true;
+			}else {
+				return false;
+			}
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			return false;
+		}
+
+	}
+
+	public void incrementLockCount(String username) {
+		try {
+			int original = getLockCount(username);
+			int newCount = original + 1;
+			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+	}
+	public void resetLockCount(String username) {
+		try {
+			int newCount = 0;
+			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+
+		}catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		//UPDATE `new_schema`.`new_table` SET `lockcount` = '387' WHERE (`username` = 'Ben');
+	}
+
+
 }
