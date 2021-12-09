@@ -65,12 +65,18 @@ public class DBaseConnection {
             System.out.println("Original Contents");
             rset = stmt.executeQuery("SELECT * FROM new_table;");
             printResultSet(rset);
+
+			//Find username code
+            rset = stmt.executeQuery("SELECT COUNT(1) FROM new_table WHERE 'ben Sottile' = username");
+            printResultSet(rset);
+
+
            
             // -- a query will return a ResultSet
             // -- city is a table within the world database
 //            rset = stmt.executeQuery("SELECT * FROM city;");
             System.out.println("Inserted Contents");
-            stmt.executeUpdate("INSERT INTO new_table VALUE('cHerberg', 'cHerberg1234', 'death@yahoo.com', 0);");
+            stmt.executeUpdate("INSERT INTO new_table VALUE('ben Sottile', 'cHerberg1234', 'death@yahoo.com', 0);");
             rset = stmt.executeQuery("SELECT * FROM new_table;");
             printResultSet(rset);
             
@@ -93,7 +99,7 @@ public class DBaseConnection {
 	        // -- the metadata tells us how many columns in the data
 			ResultSetMetaData rsmd = rset.getMetaData();
 	        int numberOfColumns = rsmd.getColumnCount();
-	        System.out.println("columns: " + numberOfColumns);
+//	        System.out.println("columns: " + numberOfColumns);
 	        
 	        // -- loop through the ResultSet one row at a time
 	        //    Note that the ResultSet starts at index 1
@@ -104,6 +110,7 @@ public class DBaseConnection {
 	        	}
 	        	System.out.println(rset.getString(numberOfColumns));
 	        }
+
 		}
 		catch (SQLException ex) {
 			// handle any errors
@@ -126,4 +133,7 @@ public class DBaseConnection {
 		dbc.accessDatabase();
 	}
 
+	public boolean exists(String field, String search) {
+    	return false;
+	}
 }

@@ -10,6 +10,7 @@ package Server;
 import java.util.HashMap;
 import java.util.Set;
 
+import Client.DBaseConnection;
 import Common.NetworkAccess;
 
 /**
@@ -38,6 +39,7 @@ public class CommandProtocol {
 	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch)
 
 
+
 	{
 		if (cmd.equals("disconnect")) {
 
@@ -52,8 +54,31 @@ public class CommandProtocol {
 			na.sendString("world!" + "\n", false);
 			
 		}
+		else if (cmd.contains("register")){
+			String username;
+			String password;
+			String email;
+			String[] cmdList = cmd.split(";");
+			int count = 0;
+			for (String word : cmdList) {
+				if(count == 0){
+					count++;
+					continue;
+				}else if (count == 1){
+					username = word;
+					count++;
+				}else if(count == 2){
+					password = word;
+					count++;
+				}else if(count == 3){
+					email = word;
+				}
+				DBaseConnection dbc = new DBaseConnection();
+				dbc.exists();
+			}
+
+		}
 		else {
-			
 			na.sendString(cmd + "\n", false);
 			
 		}		
