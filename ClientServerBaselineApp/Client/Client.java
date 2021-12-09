@@ -65,4 +65,14 @@ public class Client {
 			// System.err.println("Can't Send");
 		}
 	}
+
+	public void passwordChange(String username, String newPassword) {
+		String request;
+		try{
+			networkaccess.sendString("passwordChange;"+username+";"+newPassword+";",true);
+		}
+		catch (Exception ex){
+			// System.err.println("Can't Send");
+		}
+	}
 }

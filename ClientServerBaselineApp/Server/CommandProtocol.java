@@ -38,129 +38,126 @@ public class CommandProtocol {
 	 * @param ch: ClientHandler object requesting the processing
 	 * @return
 	 */
-	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch) throws SQLException {
-		String[] cmdArr = cmd.split(";");
-		if (cmd.equals("disconnect")) {
-			// -- no response to the client is necessary
-			na.close();
-			ch.getServer().removeID(ch.getID());
-			ch.Stop();
-		}
-		else if (cmd.contains("register")){
-			DBaseConnection dbc = null;
-			String username = null;
-			String password = null;
-			String email= null;
-			String[] cmdList = cmd.split(";");
-			int count = 0;
-			for (String word : cmdList) {
-				if (count == 0) {
-					count++;
-					continue;
-				} else if (count == 1) {
-					username = word;
-					count++;
-				} else if (count == 2) {
-					password = word;
-					count++;
-				} else if (count == 3) {
-					email = word;
-				}
-			}
-			if(System.getProperty("user.name").equals("bjsot")){
-				dbc = new DBaseConnection("root","?Vagus39");
-			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
-				dbc = new DBaseConnection("root", "ravenisdark32!");
-			}
-			int usernameExists = dbc.exists( "username", username);
-			int emailExists = dbc.exists("email",email);
-			if(usernameExists == 0 && emailExists == 0){
-				dbc.addNewRecord(username,password,email);
-				na.sendString("SUCCESS",false);
-			}else {
-				if(usernameExists == 1 && emailExists == 1){
-					na.sendString("FAIL11",false);
-				}else if(usernameExists == 0 && emailExists == 1){
-					na.sendString("FAIL01",false);
-				}else if(usernameExists == 1 && emailExists == 0){
-					na.sendString("FAIL10",false);
-				}
-			}
-		}
-		else if (cmdArr[0].equals("passwordRecovery")){ // passwordRecovery;USERNAME\n
-			DBaseConnection dBaseConnection = new DBaseConnection();
-			User user = dBaseConnection.getUser(cmdArr[1]);
-			if(user.isLocked()){
-				try {
-					// new password
-					String tempPass = "tempPass12343";
-					// update
-					dBaseConnection.updateUserStringData(user.getUsername(), "password", tempPass);
-					dBaseConnection.updateUserIntData(user.getUsername(), "lockcount", 0);
-					// send
-					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
-				}
-				catch (InterruptedException | SQLException ex){
+	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch){
+		try {
+			DBaseConnection dbc = System.getProperty("user.name").equals("bjsot")?
+					new DBaseConnection("root", "?Vagus39") : new DBaseConnection("root", "ravenisdark32!");
+			String[] cmdArr = cmd.split(";");
 
-				}
-			}
-			else{
-				try {
-					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
-
-				}
-				catch (InterruptedException ex){
-
-				}
-			}
-			na.sendString("If username is valid, your password has been sent to the email on record", false);
-		}
-		else if(cmd.contains("login")) {
-			int lockcount = 0;
-			DBaseConnection dbc = null;
-			String username = null;
-			String password = null;
-			String[] cmdList = cmd.split(";");
-			int count = 0;
-			for (String word : cmdList) {
-				if (count == 0) {
-					count++;
-					continue;
-				} else if (count == 1) {
-					username = word;
-					count++;
-				} else if (count == 2) {
-					password = word;
-					count++;
-				}
-			}
-			if(System.getProperty("user.name").equals("bjsot")){
-				dbc = new DBaseConnection("root","?Vagus39");
-			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
-				dbc = new DBaseConnection("root", "ravenisdark32!");
-			}
-			int usernameExists = dbc.exists( "username", username);
-			if(usernameExists == 1){
-				lockcount = dbc.getLockCount(username);
-				if(lockcount >= 3){
-					na.sendString("LockedOut",false);
-				}else {
-					if(dbc.passwordMatch(username,password)) {
-						na.sendString("Success", false);
-					}else {
-						dbc.incrementLockCount(username);
-						na.sendString("IncorrectPassword", false);
+			if (cmd.equals("disconnect")) {
+				// -- no response to the client is necessary
+				na.close();
+				ch.getServer().removeID(ch.getID());
+				ch.Stop();
+			} else if (cmd.contains("register")) {
+				String username = null;
+				String password = null;
+				String email = null;
+				String[] cmdList = cmd.split(";");
+				int count = 0;
+				for (String word : cmdList) {
+					if (count == 0) {
+						count++;
+						continue;
+					} else if (count == 1) {
+						username = word;
+						count++;
+					} else if (count == 2) {
+						password = word;
+						count++;
+					} else if (count == 3) {
+						email = word;
 					}
 				}
-			} else {
-				na.sendString("IncorrectPassword", false);
-			}
+				int usernameExists = dbc.exists("username", username);
+				int emailExists = dbc.exists("email", email);
+				if (usernameExists == 0 && emailExists == 0) {
+					dbc.addNewRecord(username, password, email);
+					na.sendString("SUCCESS", false);
+				} else {
+					if (usernameExists == 1 && emailExists == 1) {
+						na.sendString("FAIL11", false);
+					} else if (usernameExists == 0 && emailExists == 1) {
+						na.sendString("FAIL01", false);
+					} else if (usernameExists == 1 && emailExists == 0) {
+						na.sendString("FAIL10", false);
+					}
+				}
+			} else if (cmdArr[0].equals("passwordRecovery")) { // passwordRecovery;USERNAME\n
+				User user = dbc.getUser(cmdArr[1]);
+				if (user.isLocked()) {
+					try {
+						// new password
+						String tempPass = "tempPass12343";
+						// update
+						dbc.updateUserStringData(user.getUsername(), "password", tempPass);
+						dbc.updateUserIntData(user.getUsername(), "lockcount", 0);
+						// send
+						SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
+					} catch (InterruptedException | SQLException ex) {
 
+					}
+				} else {
+					try {
+						SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
+
+					} catch (InterruptedException ex) {
+
+					}
+				}
+				na.sendString("If username is valid, your password has been sent to the email on record", false);
+
+			} else if (cmdArr[0].equals("passwordChange")) { // passwordRecovery;USERNAME;NEWPASSWORD\n
+				System.out.println("Change pass server");
+				dbc.updateUserStringData(cmdArr[1], "password", cmdArr[2]);
+				na.sendString("password has been updated", false);
+
+			} else if (cmd.contains("login")) {
+				int lockcount = 0;
+				String username = null;
+				String password = null;
+				String[] cmdList = cmd.split(";");
+				int count = 0;
+				for (String word : cmdList) {
+					if (count == 0) {
+						count++;
+						continue;
+					} else if (count == 1) {
+						username = word;
+						count++;
+					} else if (count == 2) {
+						password = word;
+						count++;
+					}
+				}
+				int usernameExists = dbc.exists("username", username);
+				if (usernameExists == 1) {
+					lockcount = dbc.getLockCount(username);
+					if (lockcount >= 3) {
+						na.sendString("LockedOut", false);
+					} else {
+						if (dbc.passwordMatch(username, password)) {
+							na.sendString("Success", false);
+						} else {
+							dbc.incrementLockCount(username);
+							na.sendString("IncorrectPassword", false);
+						}
+					}
+				} else {
+					na.sendString("IncorrectPassword", false);
+				}
+
+			} else {
+
+				na.sendString(cmd + "\n", false);
+				System.out.println("Fix this ----");
+			}
 		}
-		else {
-			
-			na.sendString(cmd + "\n", false);
-			
-		}		
+		catch (SQLException ex){
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
 	}
 }

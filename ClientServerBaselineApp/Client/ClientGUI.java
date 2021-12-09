@@ -387,9 +387,6 @@ public class ClientGUI extends Application
         });
 
 
-
-
-
         int maxwidth = 100;
         oldPasswordField.setMaxWidth(maxwidth);
         newPasswordField.setMaxWidth(maxwidth);
@@ -400,9 +397,9 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
 
-                String oldPassword = oldPasswordField.getText();
-                String newPassword = newPasswordField.getText();
-                String verifyNewPassword = verifyNewPasswordField.getText();
+                String oldPassword = oldPasswordField.getText().trim();
+                String newPassword = newPasswordField.getText().trim();
+                String verifyNewPassword = verifyNewPasswordField.getText().trim();
 
                 boolean success = true;
 
@@ -428,12 +425,7 @@ public class ClientGUI extends Application
                 }
 
                 if(success == true) {
-                    // updates password in database
-                    // refer to ben's loginPage
-                    // mainStage.setScene(loginGUI);
-                } else {
-                    // empty fields for change password (go back to changePassword scene)
-                    // mainStage.setScene(changePasswordGUI);
+                    client.passwordChange(usernameField.getText(), newPassword);
                 }
 
             }

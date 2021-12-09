@@ -118,7 +118,7 @@ public class ClientHandler extends Thread {
 				this.servergui.addToTextArea(cmd);
 				CommandProtocol.processCommand(cmd, networkaccess, this);
 			} 
-			catch (IOException | SQLException e) {
+			catch (IOException e) {
 				
 				e.printStackTrace();
 				go = false;
