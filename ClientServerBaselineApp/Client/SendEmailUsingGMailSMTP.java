@@ -43,10 +43,8 @@ public class SendEmailUsingGMailSMTP {
 
 		// -- Set up the recipient's email address
 		String to = emailSend;
-		int c = 0;
-		while(c < 5){
 			Thread.sleep(10000);
-			c++;
+
 			try {
 				// -- Create a default MimeMessage object.
 				Message message = new MimeMessage(session);
@@ -79,5 +77,4 @@ public class SendEmailUsingGMailSMTP {
 				throw new RuntimeException(e);
 			}
 		}
-	}
 }

@@ -7,8 +7,8 @@ package Server;
 //Tuesday
 //Wednesday Use bootcamp code switch
 
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Set;
 
 import Client.DBaseConnection;
 import Client.SendEmailUsingGMailSMTP;
@@ -42,38 +42,35 @@ public class CommandProtocol {
 	{
 		String[] cmdArr = cmd.split(";");
 		if (cmd.equals("disconnect")) {
-
 			// -- no response to the client is necessary
 			na.close();
 			ch.getServer().removeID(ch.getID());
 			ch.Stop();
 		}
-		else if (cmd.equals("hello")) {
-
-			// -- client is expecting a response
-			na.sendString("world!" + "\n", false);
-
-		}
 		else if (cmdArr[0].equals("passwordRecovery")){ // passwordRecovery;USERNAME\n
 			DBaseConnection dBaseConnection = new DBaseConnection();
-			System.out.println("Server getting email");
 			User user = dBaseConnection.getUser(cmdArr[1]);
-			if(!user.isLocked()){
-				System.out.println("Send Email "+user.getEmail());
+			System.out.println(user.getLockCount());
+			if(user.isLocked()){
+				try {
+					// new password
+					String tempPass = "tempPass12343";
+					// update
+					dBaseConnection.updateUserStringData(user.getUsername(), "password", tempPass);
+					// send
+					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
+				}
+				catch (InterruptedException | SQLException ex){
+
+				}
+			}
+			else{
 				try {
 					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
 				}
 				catch (InterruptedException ex){
 
 				}
-			}
-			else{
-				// new password
-
-				// update
-
-				// send
-				System.out.println("Send Email "+user.getEmail());
 			}
 			na.sendString("If username is valid, your password has been sent to the email on record", false);
 		}

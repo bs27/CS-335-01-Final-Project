@@ -69,16 +69,12 @@ public class DBaseConnection {
     	return new User("Nemo","Nihil","Null");
 	}
 
-	public void updateUserPassword(String username, String password){
-		try{
-			rset = stmt.executeQuery("UPDATE user SET user WHERE username='"+username+"';");
-		}
-		catch (SQLException ex) {
-			// handle any errors
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}
+	public void updateUserStringData(String username, String contentType, String content) throws SQLException {
+    	stmt.executeUpdate("UPDATE user SET "+contentType+"='"+content+"' WHERE username='"+username+"';");
+	}
+
+	public void updateUserIntData(String username, String contentType, int content) throws SQLException {
+		stmt.executeUpdate("UPDATE user SET "+contentType+"='"+content+"' WHERE username="+username+";");
 	}
 
 	public void printResultSet(ResultSet rset)

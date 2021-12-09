@@ -30,6 +30,10 @@ public class User {
             lockCount++;
     }
 
+    public int getLockCount(){
+        return lockCount;
+    }
+
     public String getUsername(){
         return username;
     }
