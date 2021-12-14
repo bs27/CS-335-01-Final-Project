@@ -73,7 +73,9 @@ public class Client {
 		username = username.trim();
 		String request;
 		try{
-			networkaccess.sendString("passwordRecovery;"+username+";",true);
+			request = networkaccess.sendString("passwordRecovery;"+username+";",true);
+			AlertBox.Display("Recover",request);
+
 		}
 		catch (Exception ex){
 			// System.err.println("Can't Send");
@@ -90,3 +92,4 @@ public class Client {
 		}
 	}
 }
+

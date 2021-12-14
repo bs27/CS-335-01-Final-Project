@@ -7,17 +7,11 @@ package Server;
 //Tuesday
 //Wednesday Use bootcamp code switch
 
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Set;
 
-import Client.AlertBox;
-import Client.DBaseConnection;
 import Common.NetworkAccess;
 import Common.User;
-import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
-import sun.applet.Main;
 
 /**
  * @author reinhart
@@ -171,20 +165,28 @@ public class CommandProtocol {
 				dbc = new DBaseConnection("root", "ravenisdark32!");
 			}
 			User user = dbc.getUser(cmdArr[1]);
+			if(0 == dbc.exists("username",cmdArr[1])){
+				na.sendString("If username is valid, your password has been sent to the email on record\"",false);
+				return;
+			}else {
+
+			}
+			String tempPass = "tempPass12343";
 			if (user.isLocked()) {
 				try {
 					// new password
-					String tempPass = "tempPass12343";
 					// update
 					dbc.updateUserStringData(user.getUsername(), "password", tempPass);
 					dbc.updateUserIntData(user.getUsername(), "lockcount", 0);
 					// send
 					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
+
 				} catch (InterruptedException | SQLException ex) {
 
 				}
 			} else {
 				try {
+					dbc.updateUserStringData(user.getUsername(), "password", tempPass);
 					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
 
 				} catch (InterruptedException ex) {

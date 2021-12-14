@@ -1,4 +1,4 @@
-package Client;// -- download MySQL from: http://dev.mysql.com/downloads/
+package Server;// -- download MySQL from: http://dev.mysql.com/downloads/
 //    Community Server version
 // -- Installation instructions are here: http://dev.mysql.com/doc/refman/5.7/en/installing.html
 // -- open MySQL Workbench to see the contents of the database
@@ -164,7 +164,6 @@ public class DBaseConnection {
 			ResultSetMetaData rsmd = rset.getMetaData();
 			int numberOfColumns = rsmd.getColumnCount();
 			rset.next();
-
 			if (Integer.parseInt(rset.getString(1)) == 0){
 				return 0;
 			}else if(Integer.parseInt(rset.getString(1)) == 1){

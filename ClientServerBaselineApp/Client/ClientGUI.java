@@ -1,8 +1,6 @@
 package Client;
 
 
-import Tetris.Tetris;
-import com.sun.corba.se.impl.orb.ParserTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -11,17 +9,10 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import java.util.Collections;
-import java.util.Arrays;
-
-import javax.swing.*;
-import java.io.IOException;
 
 public class ClientGUI extends Application
 {
@@ -144,7 +135,6 @@ public class ClientGUI extends Application
         disconnect2 = new Button("Disconnect");
 
         submitRequest = new Button("Submit");
-        BorderPane root = new BorderPane();
         // set up
         VBox input = new VBox();
         input.setSpacing(10);
@@ -152,19 +142,15 @@ public class ClientGUI extends Application
         input.getChildren().add(new Label("Username"));
         input.getChildren().add(username);
         input.getChildren().add(submitRequest);
-        root.setLeft(input);
-        BorderPane.setMargin(input, new Insets(10));
+
+
         VBox links = new VBox();
-        links.setSpacing(10);
         links.getChildren().add(toRegiPage);
         links.getChildren().add(toLoginPage);
         links.getChildren().add(new Label(" ")); // empty space
         links.getChildren().add(disconnect2);
-        root.setRight(links);
-        BorderPane.setMargin(links, new Insets(10));
-        root.setBottom(disconnect2);
-        BorderPane.setMargin(root.getBottom(), new Insets(10,10,10,WIDTH-100));
-        recoverPasswordGUI = new Scene(root, WIDTH, HEIGHT);
+        input.getChildren().add(links);
+        recoverPasswordGUI = new Scene(input, 500, 300);
         disconnect2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -172,6 +158,7 @@ public class ClientGUI extends Application
                 client.disconnect();
                 client = null;
                 mainStage.setScene(connectGUI);
+                username.clear();
 
             }
         });
@@ -179,7 +166,14 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
                 System.out.println("ATTEMPTING TO RECOVER PASSWORD");
-                client.passwordRecovery(username.getText());
+                if(username.getText().equals("")) {
+                    AlertBox.Display("Error", "No username Submitter");
+                }else {
+                    client.passwordRecovery(username.getText());
+                }
+
+
+
             }
         });
 
@@ -208,11 +202,15 @@ public class ClientGUI extends Application
         });
 
 
+
         loginGUI = new Scene(new VBox(new Label("WELCOME!"), new Label("Username:"), usernameField,new Label("Password:"),passwordField,submitButton,forgotPassButton,registerButton,disconnect));
         registerButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+
                 mainStage.setScene(registrationGUI);
+                usernameField.clear();
+                passwordField.clear();
             }
         });
 
@@ -221,7 +219,9 @@ public class ClientGUI extends Application
             public void handle(ActionEvent actionEvent) {
                 mainStage.setScene(recoverPasswordGUI);
                 mainStage.show();
-                root.requestFocus();
+                input.requestFocus();
+                usernameField.clear();
+                passwordField.clear();
 
             }
         });
@@ -236,6 +236,9 @@ public class ClientGUI extends Application
                     client.setUsername(usernameField.getText());
                     welcomeMesAGE.setText("Welcome to Booked Blocks " + client.getUsername() + "!");
                     mainStage.setScene(postLoginGUI);
+                    usernameField.clear();
+                    passwordField.clear();
+
 
                 }else {
                     if(response.equals("LockedOut")){
@@ -274,9 +277,15 @@ public class ClientGUI extends Application
                     }
 
                     if(checkIP(host)){
-                        client = new Client(host, port);
-                        mainStage.setTitle("Booked Blocks");
-                        mainStage.setScene(loginGUI);
+                        try{
+                            client = new Client(host, port);
+                            mainStage.setTitle("Booked Blocks");
+                            mainStage.setScene(loginGUI);
+                        }catch (Exception e){
+                            AlertBox.Display("Error", e.getMessage());
+                        }
+
+
 
                     }else {
                         errorIncorrectIPFormat.setVisible(true);
@@ -329,6 +338,9 @@ public class ClientGUI extends Application
                     String rtnString = client.getNetworkAccess().sendString(stringToSend,true);
                     if(rtnString.equals("SUCCESS")){
                         AlertBox.Display("Success", "New Account Successfully Created");
+                        emailField.clear();
+                        usernameField2.clear();
+                        passwordField2.clear();
                         mainStage.setScene(loginGUI);
                     }else if (rtnString.equals("FAIL11")){
                         AlertBox.Display("Error!","This Email and Username have already been registered");
@@ -337,7 +349,7 @@ public class ClientGUI extends Application
                     }else if(rtnString.equals("FAIL10")){
                         AlertBox.Display("Error!","This username has already been registered");
                     }else {
-                        AlertBox.Display("Uh-oh","Some broke...sorry - Ben");
+                        AlertBox.Display("Uh-oh","Something broke...sorry - Ben");
                     }
                 }
 
@@ -358,18 +370,28 @@ public class ClientGUI extends Application
 
                 // refer to ben's login page scene
                    mainStage.setScene(loginGUI);
+                emailField.clear();
+                usernameField2.clear();
+                passwordField2.clear();
+
             }
         });
         toLoginPage.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 mainStage.setScene(loginGUI);
+                emailField.clear();
+                usernameField2.clear();
+                passwordField2.clear();
             }
         });
         toRegiPage.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 mainStage.setScene(registrationGUI);
+                emailField.clear();
+                usernameField2.clear();
+                passwordField2.clear();
             }
         });
 
@@ -465,6 +487,11 @@ public class ClientGUI extends Application
 
                 if(success == true) {
                     client.passwordChange(usernameField.getText(), newPassword);
+                    usernameField.clear();
+                    oldPasswordField.clear();
+                    newPasswordField.clear();
+
+
                     // updates password in database
                     // refer to ben's loginPage
                     // mainStage.setScene(loginGUI);
@@ -481,6 +508,9 @@ public class ClientGUI extends Application
             public void handle(ActionEvent actionEvent) {
                 // refer to ben's loginPage scene
                 mainStage.setScene(postLoginGUI);
+                usernameField.clear();
+                oldPasswordField.clear();
+                newPasswordField.clear();
             }
         });
 
@@ -492,6 +522,9 @@ public class ClientGUI extends Application
                 client.disconnect();
                 client = null;
                 mainStage.setScene(connectGUI);
+                usernameField.clear();
+                oldPasswordField.clear();
+                newPasswordField.clear();
             }
         });
 
@@ -501,6 +534,7 @@ public class ClientGUI extends Application
     private void logoutnow() {
         client.getNetworkAccess().sendString("logout;"+client.getUsername(),false);
         client.setUsername("");
+
     }
 
     // -- launch the application

@@ -1,6 +1,5 @@
 package Server;
 
-import Client.DBaseConnection;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,8 +14,8 @@ import javafx.stage.WindowEvent;
 
 public class ServerGUI extends Application
 {
-    int WIDTH = 250;
-    int HEIGHT = 256;
+    int WIDTH = 490;
+
 
     private Scene mainScene;
 
@@ -32,8 +31,9 @@ public class ServerGUI extends Application
     public void start(Stage mainStage)
     {
         // -- Application title
-        mainStage.setTitle("JavaFX Graphics Application");
+        mainStage.setTitle("Server");
         mainStage.setWidth(WIDTH);
+
 
         // -- construct the controls
         controlBox = new ControlBoxInner(this);
@@ -103,6 +103,8 @@ public class ServerGUI extends Application
         public ControlBoxInner(ServerGUI gui)
         {
             super();
+
+
 
 
             this.owner = gui;
@@ -264,8 +266,8 @@ public class ServerGUI extends Application
             // -- build a simple GUI
             int maxwidth = 100;
             primefield.setMaxWidth(maxwidth);
-            textarea.setMaxWidth(maxwidth);
-            textarea.setMaxHeight(100);
+            textarea.setMaxWidth(500);
+            textarea.setMaxHeight(300);
             this.getChildren().add(startserverbutton);
             this.getChildren().add(getconnectionsbutton);
             this.getChildren().add(numOfUsersBtn);
@@ -275,7 +277,7 @@ public class ServerGUI extends Application
             this.getChildren().add(getNumOfUsersLoggedOutBtn);
             this.getChildren().add(getUsersLoggedOutBtn);
             this.getChildren().add(numOfConnectedBtn);
-            this.getChildren().add(new Label("Command Output Label"));
+            this.getChildren().add(new Label("Command Output"));
             this.getChildren().add(textarea);
 
         }
