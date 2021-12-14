@@ -7,6 +7,7 @@ package Server;
 //Tuesday
 //Wednesday Use bootcamp code switch
 
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.Set;
 import Client.AlertBox;
 import Client.DBaseConnection;
 import Common.NetworkAccess;
+import Common.User;
 import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
 import sun.applet.Main;
 
@@ -41,6 +43,8 @@ public class CommandProtocol {
 	 * @return
 	 */
 	public static void processCommand(String cmd, NetworkAccess na, ClientHandler ch) throws SQLException {
+		String[] cmdArr = cmd.split(";");
+
 		if (cmd.equals("disconnect")) {
 
 			// -- no response to the client is necessary
@@ -158,6 +162,47 @@ public class CommandProtocol {
 			}else {
 				na.sendString("IncorrectPassword", false);
 			}
+
+		}else if (cmdArr[0].equals("passwordRecovery")) { // passwordRecovery;USERNAME\n
+			DBaseConnection dbc = null;
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			User user = dbc.getUser(cmdArr[1]);
+			if (user.isLocked()) {
+				try {
+					// new password
+					String tempPass = "tempPass12343";
+					// update
+					dbc.updateUserStringData(user.getUsername(), "password", tempPass);
+					dbc.updateUserIntData(user.getUsername(), "lockcount", 0);
+					// send
+					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), tempPass);
+				} catch (InterruptedException | SQLException ex) {
+
+				}
+			} else {
+				try {
+					SendEmailUsingGMailSMTP.sendPasswordEmail(user.getEmail(), user.getPassword());
+
+				} catch (InterruptedException ex) {
+
+				}
+			}
+			na.sendString("If username is valid, your password has been sent to the email on record", false);
+
+		} else if (cmdArr[0].equals("passwordChange")) { // passwordRecovery;USERNAME;NEWPASSWORD\n
+			DBaseConnection dbc = null;
+			if(System.getProperty("user.name").equals("bjsot")){
+				dbc = new DBaseConnection("root","?Vagus39");
+			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
+				dbc = new DBaseConnection("root", "ravenisdark32!");
+			}
+			System.out.println("Change pass server");
+			dbc.updateUserStringData(cmdArr[1], "password", cmdArr[2]);
+			na.sendString("password has been updated", false);
 
 		}else {
 			na.sendString(cmd + "\n", false);

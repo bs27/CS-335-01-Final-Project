@@ -1,6 +1,7 @@
 package Client;
 
 
+import Tetris.Tetris;
 import com.sun.corba.se.impl.orb.ParserTable;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,6 +17,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import java.util.Collections;
+import java.util.Arrays;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -45,7 +48,7 @@ public class ClientGUI extends Application
 //Connect GUI
     Label enterIP = new Label("Enter IP Address Below");
     TextField ipAddressField = new TextField("localhost");
-    Label errorIncorrectIPFormat = new Label("This isn't an IP Address DUMBASS!");
+    Label errorIncorrectIPFormat = new Label("This isn't an IP Address");
     //Registration GUI
     private Button registerButton2 = new Button("Submit");
     private Button loginPageButton = new Button("Back to Login Page");
@@ -61,7 +64,7 @@ public class ClientGUI extends Application
     private Button disconnect2;
     private Button submitRequest;
     //Post Login GUI
-    private Label welcomeMesAGE = new Label("Welcome to Booked Blocks! " + getUsername());
+    private Label welcomeMesAGE = new Label("Welcome to BooKeD Blocks");
     private Button highScoresButton = new Button("High Scores");
     private Button howToPlayButton = new Button("How to Play");
     private Button changePasswordButton = new Button("Change Password");
@@ -148,8 +151,6 @@ public class ClientGUI extends Application
         input.getChildren().add(new Label("~Recover Password~"));
         input.getChildren().add(new Label("Username"));
         input.getChildren().add(username);
-        input.getChildren().add(new Label("Email"));
-        input.getChildren().add(email);
         input.getChildren().add(submitRequest);
         root.setLeft(input);
         BorderPane.setMargin(input, new Insets(10));
@@ -172,6 +173,13 @@ public class ClientGUI extends Application
                 client = null;
                 mainStage.setScene(connectGUI);
 
+            }
+        });
+        submitRequest.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                System.out.println("ATTEMPTING TO RECOVER PASSWORD");
+                client.passwordRecovery(username.getText());
             }
         });
 
@@ -226,6 +234,7 @@ public class ClientGUI extends Application
                 String response = client.getNetworkAccess().sendString(message,x);
                 if(response.equals("Success")){
                     client.setUsername(usernameField.getText());
+                    welcomeMesAGE.setText("Welcome to Booked Blocks " + client.getUsername() + "!");
                     mainStage.setScene(postLoginGUI);
 
                 }else {
@@ -346,6 +355,7 @@ public class ClientGUI extends Application
         loginPageButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+
                 // refer to ben's login page scene
                    mainStage.setScene(loginGUI);
             }
@@ -374,6 +384,12 @@ public class ClientGUI extends Application
         playButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                /*try {
+                    //new Tetris.GraphicsSwing();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
 
 
             }
@@ -420,9 +436,9 @@ public class ClientGUI extends Application
             @Override
             public void handle(ActionEvent actionEvent) {
 
-                String oldPassword = oldPasswordField.getText();
-                String newPassword = newPasswordField.getText();
-                String verifyNewPassword = verifyNewPasswordField.getText();
+                String oldPassword = oldPasswordField.getText().trim();
+                String newPassword = newPasswordField.getText().trim();
+                String verifyNewPassword = verifyNewPasswordField.getText().trim();
 
                 boolean success = true;
 
@@ -448,6 +464,7 @@ public class ClientGUI extends Application
                 }
 
                 if(success == true) {
+                    client.passwordChange(usernameField.getText(), newPassword);
                     // updates password in database
                     // refer to ben's loginPage
                     // mainStage.setScene(loginGUI);
@@ -512,8 +529,6 @@ public class ClientGUI extends Application
         Alert error = new Alert(Alert.AlertType.ERROR);
         error.setTitle(title);
         error.setContentText(contentText);
-    }private String getUsername() {
-    return "No username";
-}
+    }
 
 }

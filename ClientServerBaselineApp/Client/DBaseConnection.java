@@ -2,6 +2,8 @@ package Client;// -- download MySQL from: http://dev.mysql.com/downloads/
 //    Community Server version
 // -- Installation instructions are here: http://dev.mysql.com/doc/refman/5.7/en/installing.html
 // -- open MySQL Workbench to see the contents of the database
+import Common.User;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -233,8 +235,13 @@ public class DBaseConnection {
 	public void incrementLockCount(String username) {
 		try {
 			int original = getLockCount(username);
-			int newCount = original + 1;
-			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+			if(original >= 3){
+
+			}else {
+				int newCount = original + 1;
+				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+			}
+
 
 		}catch (SQLException ex){
 			System.out.println("SQLException: " + ex.getMessage());
@@ -297,7 +304,7 @@ public class DBaseConnection {
 			int count = 0;
 			String[] usersLocked;
 			String usernameTBA = "";
-			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '3' = lockcount");
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '3' <= lockcount");
 			rset.next();
 			int numberOfUsersLockedOut = Integer.parseInt(rset.getString(1));
 			if (numberOfUsersLockedOut == 0){
@@ -305,7 +312,7 @@ public class DBaseConnection {
 				return usersLocked;
 			}
 			usersLocked = new String[numberOfUsersLockedOut];
-			rset = stmt.executeQuery("SELECT * FROM new_table where '3' = lockcount");
+			rset = stmt.executeQuery("SELECT * FROM new_table where '3' <= lockcount");
 			while (rset.next()) {
 				// -- loop through the columns of the ResultSet
 				usernameTBA = rset.getString(1);
@@ -423,4 +430,50 @@ public class DBaseConnection {
 			return usersLocked;
 		}
 	}
+	public User getUser(String username){
+		try{
+			rset = stmt.executeQuery("SELECT * FROM new_table WHERE username='"+username+"';");
+			rset.next();
+			return new User(rset.getString("username"),rset.getString("password"),rset.getString("email"),rset.getInt("lockcount"));
+		}
+		catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return new User("Nemo","Nihil","Null");
+	}
+
+	public void updateUserStringData(String username, String contentType, String content) throws SQLException {
+		try {
+			stmt.executeUpdate("UPDATE new_table SET " + contentType + "='" + content + "' WHERE username='" + username + "';");
+		}
+		catch (SQLException ex){
+			System.out.println("Failed updating UserStringData");
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+
+	public void updateUserIntData(String username, String contentType, int content){
+		try {
+			System.out.println("UPDATE new_table SET " + contentType + "=" + content + " WHERE username='" + username + "';");
+			stmt.executeUpdate("UPDATE new_table SET " + contentType + "=" + content + " WHERE username='" + username + "';");
+		}
+		catch (SQLException ex){
+			System.out.println("Failed updating UserIntData");
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
 }
+
+
+
+
+
+
+

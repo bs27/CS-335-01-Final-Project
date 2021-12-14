@@ -4,7 +4,7 @@ import Common.NetworkAccess;
 import java.net.ServerSocket;
 
 public class Client {
-	private String username;
+	private String username = "";
 
 
 	/*
@@ -66,6 +66,27 @@ public class Client {
 	}
 
 	public String getUsername() {
+
 		return username;
+	}
+	public void passwordRecovery(String username) {
+		username = username.trim();
+		String request;
+		try{
+			networkaccess.sendString("passwordRecovery;"+username+";",true);
+		}
+		catch (Exception ex){
+			// System.err.println("Can't Send");
+		}
+	}
+
+	public void passwordChange(String username, String newPassword) {
+		String request;
+		try{
+			networkaccess.sendString("passwordChange;"+username+";"+newPassword+";",true);
+		}
+		catch (Exception ex){
+			// System.err.println("Can't Send");
+		}
 	}
 }
