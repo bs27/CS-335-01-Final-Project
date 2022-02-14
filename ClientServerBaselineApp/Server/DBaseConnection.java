@@ -24,7 +24,7 @@ public class DBaseConnection {
     // -- connect to the world database
     // -- this is the connector to the database, default port is 3306
 //    private String url = "jdbc:mysql://localhost:3306/world";
-    private String url = "jdbc:mysql://localhost:3306/new_schema";
+    private String url = "jdbc:mysql://localhost:3306/userdatabase";
     
     // -- this is the username/password, created during installation and in MySQL Workbench
     //    When you add a user make sure you give them the appropriate Administrative Roles
@@ -238,7 +238,7 @@ public class DBaseConnection {
 
 			}else {
 				int newCount = original + 1;
-				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+				stmt.executeUpdate("UPDATE `userdatabase`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
 			}
 
 
@@ -252,7 +252,7 @@ public class DBaseConnection {
 	public void resetLockCount(String username) {
 		try {
 			int newCount = 0;
-			stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+			stmt.executeUpdate("UPDATE `userdatabase`.`new_table` SET `lockcount` = '"+newCount+"' WHERE (`username` = '"+username+"')");
 
 		}catch (SQLException ex){
 			System.out.println("SQLException: " + ex.getMessage());
@@ -263,7 +263,7 @@ public class DBaseConnection {
 		public void login(String username) {
 			try {
 				int newCount = 1;
-				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+				stmt.executeUpdate("UPDATE `userdatabase`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
 
 			}catch (SQLException ex){
 				System.out.println("SQLException: " + ex.getMessage());
@@ -275,7 +275,7 @@ public class DBaseConnection {
 		public void logout(String username) {
 			try {
 				int newCount = 0;
-				stmt.executeUpdate("UPDATE `new_schema`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
+				stmt.executeUpdate("UPDATE `userdatabase`.`new_table` SET `loggedin` = '"+newCount+"' WHERE (`username` = '"+username+"')");
 			}catch (SQLException ex){
 				System.out.println("SQLException: " + ex.getMessage());
 				System.out.println("SQLState: " + ex.getSQLState());
@@ -303,7 +303,7 @@ public class DBaseConnection {
 			int count = 0;
 			String[] usersLocked;
 			String usernameTBA = "";
-			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where '3' <= lockcount");
+			rset = stmt.executeQuery("SELECT COUNT(*) FROM new_table where 3 <= lockcount");
 			rset.next();
 			int numberOfUsersLockedOut = Integer.parseInt(rset.getString(1));
 			if (numberOfUsersLockedOut == 0){
@@ -311,7 +311,7 @@ public class DBaseConnection {
 				return usersLocked;
 			}
 			usersLocked = new String[numberOfUsersLockedOut];
-			rset = stmt.executeQuery("SELECT * FROM new_table where '3' <= lockcount");
+			rset = stmt.executeQuery("SELECT * FROM new_table where 3 <= lockcount");
 			while (rset.next()) {
 				// -- loop through the columns of the ResultSet
 				usernameTBA = rset.getString(1);
