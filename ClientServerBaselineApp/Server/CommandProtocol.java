@@ -164,13 +164,14 @@ public class CommandProtocol {
 			} else if(System.getProperty("user.name").equals("Kashod Cagnolatti")) {
 				dbc = new DBaseConnection("root", "ravenisdark32!");
 			}
-			User user = dbc.getUser(cmdArr[1]);
+
 			if(0 == dbc.exists("username",cmdArr[1])){
 				na.sendString("If username is valid, your password has been sent to the email on record\"",false);
 				return;
 			}else {
 
 			}
+			User user = dbc.getUser(cmdArr[1]);
 			String tempPass = "tempPass12343";
 			if (user.isLocked()) {
 				try {

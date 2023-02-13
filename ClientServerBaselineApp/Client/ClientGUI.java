@@ -486,15 +486,17 @@ public class ClientGUI extends Application
                 }
 
                 if(success == true) {
-                    client.passwordChange(usernameField.getText(), newPassword);
-                    usernameField.clear();
+                    client.passwordChange(client.getUsername(), newPassword);
                     oldPasswordField.clear();
                     newPasswordField.clear();
+                    verifyNewPasswordField.clear();
+                    AlertBox.Display("Success!!!","Password Changed Successfully");
+
 
 
                     // updates password in database
                     // refer to ben's loginPage
-                    // mainStage.setScene(loginGUI);
+                    mainStage.setScene(loginGUI);
                 } else {
                     // empty fields for change password (go back to changePassword scene)
                     // mainStage.setScene(changePasswordGUI);
